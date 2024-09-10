@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7656716411010095513}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: BigPlatform1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48,7 +48,7 @@ GameObject:
   - component: {fileID: 4552207415677332339}
   - component: {fileID: 4672942859613015989}
   - component: {fileID: 1737474589450673325}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}

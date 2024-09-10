@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,8 +7,9 @@ public class MoveableObject : MonoBehaviour
     private bool draggingObject;
     private Camera mainCamera;
     private Track platformTrack;
+    private Rigidbody ballRb;
 
-    [SerializeField] private ScrollRect scrollRect;
+    private ScrollRect scrollRect;
 
     [SerializeField] private GameObject trackEndPrefab;
     [SerializeField] private GameObject trackPlatformConnectorPrefab;
@@ -20,9 +22,14 @@ public class MoveableObject : MonoBehaviour
     [SerializeField] private float backwardMaxDistance = 2f; //Max distance in negative direction
 
     private Vector3 initialPosition;
+    private Vector3 lastPosition;
+
 
     private void Awake()
     {
+        scrollRect = GameObject.Find("Scroll View").GetComponent<ScrollRect>();
+        ballRb = GameObject.Find("Hamster").GetComponent<Rigidbody>();
+
         mainCamera = Camera.main;
         initialPosition = transform.position;
 
@@ -40,11 +47,8 @@ public class MoveableObject : MonoBehaviour
         }
         platformTrack = new Track(initialPosition - backwardDistanceVector, initialPosition + forwardDistanceVector, trackEndPrefab, trackPlatformConnectorPrefab, trackObjectPrefab, transform.parent);
         platformTrack.UpdateConnectorPosition(transform.position);
-    }
 
-    private void Update()
-    {
-        Debug.Log(scrollRect.viewport.position.x);
+        lastPosition = transform.position;
     }
 
     public void OnMouseDrag()
@@ -78,9 +82,67 @@ public class MoveableObject : MonoBehaviour
                 break;
         }
 
-        transform.position = newPosition;
+        // Get the Rigidbody component
+        Rigidbody rb = GetComponent<Rigidbody>();
 
-        platformTrack.UpdateConnectorPosition(newPosition);
+        // Smoothly move the Rigidbody to the new position using Lerp
+        Vector3 lerpedPosition = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * 8f);
+
+        // Move the Rigidbody to the interpolated position
+        rb.MovePosition(lerpedPosition);
+
+        // Update the parent transform's position to match the Rigidbody's position
+        transform.position = rb.position;
+
+        platformTrack.UpdateConnectorPosition(lerpedPosition);
+
+        lastPosition = lerpedPosition;
+    }
+
+    private void CheckAndApplyMomentum()
+    {
+        Vector3 currentPosition = transform.position;
+        Vector3 direction = currentPosition - lastPosition;
+
+        //Debug.Log($"lastPosition: {lastPosition}, currentPosition: {currentPosition}");
+
+        if (LineIntersectsSphere(lastPosition, currentPosition, ballRb.gameObject.GetComponent<SphereCollider>()))
+        {
+            Debug.Log($"intersected, direction: {direction}");
+
+            Vector3 platformVelocity = direction; // Use the direction as the momentum
+            ballRb.AddForce(platformVelocity, ForceMode.VelocityChange);
+
+            if(moveableType == MoveableTypes.Horizontal)
+            {
+                ballRb.transform.position = currentPosition + (new Vector3(1f * Mathf.Sign(direction.x), 0, 0) );
+            }
+            else if(moveableType == MoveableTypes.Vertical)
+            {
+                ballRb.transform.position = currentPosition + (new Vector3(0, 1f * Mathf.Sign(direction.y), 0));
+            }
+
+            
+        }
+    }
+
+    private bool LineIntersectsSphere(Vector3 lineStart, Vector3 lineEnd, Collider sphereCollider)
+    {
+        Vector3 sphereCenter = sphereCollider.bounds.center;
+        float sphereRadius = sphereCollider.bounds.extents.magnitude;
+
+        Vector3 lineDir = (lineEnd - lineStart);
+        Vector3 closestPoint = Vector3.Project(sphereCenter - lineStart, lineDir.normalized) + lineStart;
+
+        // Ensure that the closest point lies on the line segment between lineStart and lineEnd
+        float dotProduct = Vector3.Dot(closestPoint - lineStart, lineEnd - lineStart);
+        if (dotProduct < 0 || dotProduct > lineDir.sqrMagnitude)
+        {
+            return false;
+        }
+
+        // Check if the distance from the sphere's center to the closest point is within the radius
+        return Vector3.Distance(sphereCenter, closestPoint) <= sphereRadius;
     }
 
     public void OnMouseUp()
