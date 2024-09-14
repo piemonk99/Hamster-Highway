@@ -20,13 +20,19 @@ public class MoveableObject : MonoBehaviour
     [SerializeField] private float forwardMaxDistance = 2f; // Max distance in positive direction
     [SerializeField] private float backwardMaxDistance = 2f; // Max distance in negative direction
 
+    [SerializeField] private float acceleration = 30f; // The acceleration the platform applies to move towards its destination
+
     private Vector3 initialPosition;
-    private Vector3 lastPosition;
-    private bool lerpingToLastPosition; // Flag to check if we should continue lerping after releasing the mouse
+    private Vector3 destination; // Destination
+    private bool movingToDestination; // Flag to check if we should continue lerping after releasing the mouse
+
+    private Rigidbody rb;
 
     private void Awake()
     {
         scrollRect = GameObject.Find("Scroll View").GetComponent<ScrollRect>();
+
+        rb = GetComponent<Rigidbody>();
 
         mainCamera = Camera.main;
         initialPosition = transform.position;
@@ -46,7 +52,7 @@ public class MoveableObject : MonoBehaviour
         platformTrack = new Track(initialPosition - backwardDistanceVector, initialPosition + forwardDistanceVector, trackEndPrefab, trackPlatformConnectorPrefab, trackObjectPrefab, transform.parent);
         platformTrack.UpdateConnectorPosition(transform.position);
 
-        lastPosition = transform.position;
+        destination = transform.position;
     }
 
     public void OnMouseDrag()
@@ -55,14 +61,14 @@ public class MoveableObject : MonoBehaviour
         {
             draggingObject = true;
             scrollRect.horizontal = false;
-            lerpingToLastPosition = false; // Stop automatic lerping when user drags
+            movingToDestination = false; // Stop automatic lerping when user drags
         }
 
         Vector3 screenPosition = Input.mousePosition;
         screenPosition.z = 10; // Set the z-distance for screen to world conversion
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
-        Vector3 newPosition = transform.position;
+        Vector3 newPosition = rb.position;
 
         switch (moveableType)
         {
@@ -81,21 +87,23 @@ public class MoveableObject : MonoBehaviour
                 break;
         }
 
-        // Get the Rigidbody component
-        Rigidbody rb = GetComponent<Rigidbody>();
+        destination = newPosition;
 
-        // Smoothly move the Rigidbody to the new position using Lerp
-        Vector3 lerpedPosition = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * 8f);
+        // // Get the Rigidbody component
+        // Rigidbody rb = GetComponent<Rigidbody>();
 
-        // Move the Rigidbody to the interpolated position
-        rb.MovePosition(lerpedPosition);
+        // // Smoothly move the Rigidbody to the new position using Lerp
+        // Vector3 lerpedPosition = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * 8f);
 
-        // Update the parent transform's position to match the Rigidbody's position
-        transform.position = rb.position;
+        // // Move the Rigidbody to the interpolated position
+        // rb.MovePosition(lerpedPosition);
 
-        platformTrack.UpdateConnectorPosition(lerpedPosition);
+        // // Update the parent transform's position to match the Rigidbody's position
+        // transform.position = rb.position;
 
-        lastPosition = lerpedPosition; // Store the last position for use after releasing the mouse
+        // platformTrack.UpdateConnectorPosition(lerpedPosition);
+
+        // lastPosition = newPosition; // Store the last position for use after releasing the mouse
     }
 
     public void OnMouseUp()
@@ -104,39 +112,46 @@ public class MoveableObject : MonoBehaviour
         {
             draggingObject = false;
             scrollRect.horizontal = true;
-            lerpingToLastPosition = true; // Start lerping to the last position after mouse release
+            movingToDestination = true; // Continue moving to the destination after mouse release
         }
     }
 
     private void Update()
     {
-        // Continue lerping to the last position if the mouse is not being dragged
-        if (!draggingObject && lerpingToLastPosition)
+        // Move to the destination
+        if (draggingObject || movingToDestination)
         {
-            LerpToLastPosition();
+            MoveToDestination();
         }
     }
 
-    private void LerpToLastPosition()
+    private void MoveToDestination()
     {
-        // Lerp the platform towards the last position
-        Vector3 lerpedPosition = Vector3.Lerp(transform.position, lastPosition, Time.deltaTime * 8f);
+        rb.constraints = RigidbodyConstraints.FreezeRotation | (moveableType == MoveableTypes.Horizontal ? RigidbodyConstraints.FreezePositionY : RigidbodyConstraints.FreezePositionX) | RigidbodyConstraints.FreezePositionZ;     
+        // Accelerate smoothly
+        // float actualSpeed = Mathf.Lerp(rb.velocity.magnitude, acceleration, Time.deltaTime * 8);
+        rb.velocity += (destination - transform.position).normalized * acceleration * Time.deltaTime;   
 
-        // Get the Rigidbody component
-        Rigidbody rb = GetComponent<Rigidbody>();
+        // // Lerp the platform towards the last position
+        // Vector3 lerpedPosition = Vector3.Lerp(transform.position, lastPosition, Time.deltaTime * 8f);
 
-        // Move the Rigidbody to the interpolated position
-        rb.MovePosition(lerpedPosition);
+        // // Get the Rigidbody component
+        // Rigidbody rb = GetComponent<Rigidbody>();
+
+        // // Move the Rigidbody to the interpolated position
+        // rb.MovePosition(lerpedPosition);
 
         // Update the parent transform's position to match the Rigidbody's position
         transform.position = rb.position;
 
-        platformTrack.UpdateConnectorPosition(lerpedPosition);
+        platformTrack.UpdateConnectorPosition(transform.position);
 
-        // Stop lerping if the platform is close enough to the last position
-        if (Vector3.Distance(transform.position, lastPosition) < 0.1f)
+        // Stop moving if the platform is close enough to the destination
+        if (Vector3.Distance(transform.position, destination) <= rb.velocity.magnitude * Time.fixedDeltaTime || ((destination - transform.position).normalized - rb.velocity.normalized).magnitude > 0.01f)
         {
-            lerpingToLastPosition = false;
+            rb.velocity = new Vector3();
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+            movingToDestination = false;
         }
     }
 }

@@ -201,6 +201,7 @@ MonoBehaviour:
   moveableType: 1
   forwardMaxDistance: 4
   backwardMaxDistance: 0
+  acceleration: 30
 --- !u!54 &876315230242989607
 Rigidbody:
   m_ObjectHideFlags: 0
