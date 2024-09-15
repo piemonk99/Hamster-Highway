@@ -28,7 +28,7 @@ public class MoveableObject : MonoBehaviour
 
     private Rigidbody rb;
 
-    private void Awake()
+    private void Start()
     {
         scrollRect = GameObject.Find("Scroll View").GetComponent<ScrollRect>();
 
@@ -130,7 +130,7 @@ public class MoveableObject : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeRotation | (moveableType == MoveableTypes.Horizontal ? RigidbodyConstraints.FreezePositionY : RigidbodyConstraints.FreezePositionX) | RigidbodyConstraints.FreezePositionZ;     
         // Accelerate smoothly
         // float actualSpeed = Mathf.Lerp(rb.velocity.magnitude, acceleration, Time.deltaTime * 8);
-        rb.velocity += (destination - transform.position).normalized * acceleration * Time.deltaTime;   
+        rb.velocity += (destination - transform.position).normalized * acceleration * Time.deltaTime;
 
         // // Lerp the platform towards the last position
         // Vector3 lerpedPosition = Vector3.Lerp(transform.position, lastPosition, Time.deltaTime * 8f);
@@ -149,7 +149,7 @@ public class MoveableObject : MonoBehaviour
         // Stop moving if the platform is close enough to the destination
         if (Vector3.Distance(transform.position, destination) <= rb.velocity.magnitude * Time.fixedDeltaTime || ((destination - transform.position).normalized - rb.velocity.normalized).magnitude > 0.01f)
         {
-            rb.velocity = new Vector3();
+            rb.velocity = Vector3.zero;
             rb.constraints = RigidbodyConstraints.FreezeAll;
             movingToDestination = false;
         }
