@@ -87,14 +87,13 @@ public class Track
 {
     private Transform trackEndA;
     private Transform trackEndB;
-    private Transform trackPlatformConnector;
     private Transform trackObject;
 
     private float arcRadius;
     private float arcAngle;
 
 
-    public Track(Vector3 endAPosition, Vector3 endBPosition, GameObject trackEndPrefab, GameObject trackPlatformConnectorPrefab, GameObject trackObjectPrefab, Transform parent)
+    public Track(Vector3 endAPosition, Vector3 endBPosition, GameObject trackEndPrefab, GameObject trackObjectPrefab, Transform parent)
     {
         //Instantiate the TrackEnd objects
         trackEndA = GameObject.Instantiate(trackEndPrefab, parent).transform;
@@ -103,16 +102,12 @@ public class Track
         trackEndB = GameObject.Instantiate(trackEndPrefab, parent).transform;
         trackEndB.position = endBPosition;
 
-        //Instantiate the TrackPlatformConnector at TrackEndA position
-        trackPlatformConnector = GameObject.Instantiate(trackPlatformConnectorPrefab, parent).transform;
-        trackPlatformConnector.position = endAPosition;
-
         //Instantiate the TrackObject and place it between the TrackEnds
         trackObject = GameObject.Instantiate(trackObjectPrefab, parent).transform;
         UpdateTrackObject();
     }
 
-    public Track(Vector3 pivotPoint, float radius, float forwardDegrees, float backwardDegrees, GameObject trackEndPrefab, GameObject trackPlatformConnectorPrefab, GameObject trackObjectPrefab, Transform parent)
+    public Track(Vector3 pivotPoint, float radius, float forwardDegrees, float backwardDegrees, GameObject trackEndPrefab, GameObject trackObjectPrefab, Transform parent)
     {
         arcRadius = radius;
 
@@ -123,13 +118,8 @@ public class Track
         trackEndB = GameObject.Instantiate(trackEndPrefab, parent).transform;
         trackEndB.position = CalculateArcPoint(pivotPoint, radius, forwardDegrees);
 
-        //Instantiate the TrackPlatformConnector at the pivot point
-        trackPlatformConnector = GameObject.Instantiate(trackPlatformConnectorPrefab, parent).transform;
-        trackPlatformConnector.position = pivotPoint;
-
         //Instantiate the TrackObject and generate the curved shape
         trackObject = GameObject.Instantiate(trackObjectPrefab, parent).transform;
-        UpdateArcTrackObject();
     }
 
     private Vector3 CalculateArcPoint(Vector3 pivotPoint, float radius, float angleInDegrees)
@@ -154,38 +144,6 @@ public class Track
         trackObject.position = (trackEndA.position + trackEndB.position) / 2f;
         trackObject.rotation = Quaternion.LookRotation(direction);
         trackObject.localScale = new Vector3(trackObject.localScale.x, trackObject.localScale.y, distance - 0.45f);
-    }
-
-    private void UpdateArcTrackObject()
-    {
-        LineRenderer lineRenderer = trackObject.gameObject.GetComponent<LineRenderer>();
-        if (lineRenderer == null)
-        {
-            lineRenderer = trackObject.gameObject.AddComponent<LineRenderer>();
-        }
-
-        lineRenderer.positionCount = 50; //Number of segments in the arc
-        lineRenderer.startWidth = 0.2f;
-        lineRenderer.endWidth = 0.2f;
-
-        for (int i = 0; i < lineRenderer.positionCount; i++)
-        {
-            float t = i / (float)(lineRenderer.positionCount - 1);
-            float angle = Mathf.Lerp(-arcAngle / 2, arcAngle / 2, t); //Covers the full arc
-            Vector3 arcPosition = CalculateArcPoint(trackPlatformConnector.position, arcRadius, angle);
-            lineRenderer.SetPosition(i, arcPosition);
-        }
-    }
-
-    //Update the position of the connector
-    public void UpdateConnectorPosition(Vector3 newPosition)
-    {
-        trackPlatformConnector.position = newPosition - Vector3.forward;
-    }
-
-    public void UpdateConnectorPosition(Vector3 pivotPoint, float arcAngle)
-    {
-        trackPlatformConnector.position = CalculateArcPoint(pivotPoint, arcRadius, arcAngle) - Vector3.forward;
     }
 }
 

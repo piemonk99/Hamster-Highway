@@ -37,8 +37,7 @@ public class RotatableObject : MonoBehaviour
         lastTargetAngle = currentAngle;
 
         //Creates track
-        platformTrack = new Track(initialPivotPoint, transform.localScale.x, forwardMaxAngle, backwardMaxAngle, trackEndPrefab, trackPlatformConnectorPrefab, trackObjectPrefab, transform.parent);
-        platformTrack.UpdateConnectorPosition(initialPivotPoint, currentAngle);
+        platformTrack = new Track(initialPivotPoint, transform.localScale.x, forwardMaxAngle, backwardMaxAngle, trackEndPrefab, trackObjectPrefab, transform.parent);
     }
 
     public void OnMouseDrag()
@@ -116,10 +115,5 @@ public class RotatableObject : MonoBehaviour
         //Rotate the platform to match the current angle
         Quaternion targetRotation = Quaternion.AngleAxis(currentAngle, Vector3.forward);
         transform.rotation = targetRotation;
-
-        //Update the platform track connector's position
-        platformTrack.UpdateConnectorPosition(pivotPoint, currentAngle);
-
-        
     }
 }
