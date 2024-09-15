@@ -106,27 +106,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &6657313402307886869
-RectTransform:
+--- !u!4 &6657313402307886869
+Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1098930021166829668}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.1, y: 1.1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6990797393232535961}
   - {fileID: 3909993695557627607}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 2.4999995, y: 1.4999998}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8769747154265449392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,6 +135,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 425bbe0d3bd1c094fb01ae2868fc0721, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxNaturalForwardSpeed: 2
+  minimumForwardSpeed: 1
+  loseBelowY: 0
+  loseSpeedFactor: 0.05
+  accelerometerMinSpeed: -0.5
+  accelerometerMaxSpeed: 1.5
+  debugText: {fileID: 0}
+  scoreText: {fileID: 0}
+  coinsText: {fileID: 0}
 --- !u!135 &6621925518670936274
 SphereCollider:
   m_ObjectHideFlags: 0

@@ -8,8 +8,6 @@ public class RotatableObject : MonoBehaviour
     private Camera mainCamera;
     private Track platformTrack;
 
-    private ScrollRect scrollRect;
-
     [SerializeField] private GameObject trackEndPrefab;
     [SerializeField] private GameObject trackPlatformConnectorPrefab;
     [SerializeField] private GameObject trackObjectPrefab;
@@ -26,7 +24,6 @@ public class RotatableObject : MonoBehaviour
 
     private void Start()
     {
-        scrollRect = GameObject.Find("Scroll View").GetComponent<ScrollRect>();
         mainCamera = Camera.main;
 
         //Gets pivot point and radius
@@ -45,7 +42,7 @@ public class RotatableObject : MonoBehaviour
         if (!draggingObject)
         {
             draggingObject = true;
-            scrollRect.horizontal = false; //Stop user from scrolling level while dragging platform
+            mainCamera.GetComponent<CameraController>().MayDrag = false;
             lerpingToLastPosition = false; //Stop automatic lerping when user drags
         }
 
@@ -73,7 +70,7 @@ public class RotatableObject : MonoBehaviour
         if (draggingObject)
         {
             draggingObject = false;
-            scrollRect.horizontal = true;
+            mainCamera.GetComponent<CameraController>().MayDrag = true;
 
             //Start lerping to the last position after releasing the mouse
             lerpingToLastPosition = true;
@@ -82,9 +79,7 @@ public class RotatableObject : MonoBehaviour
 
     private void Update()
     {
-        //Accounts for shifting the scrollRect
-        Vector3 scrollRectOffset = new Vector3(scrollRect.viewport.position.x, 0, 0);
-        pivotPoint = initialPivotPoint + scrollRectOffset;
+        pivotPoint = initialPivotPoint;
 
         //Continue lerping to the last target angle if the mouse is not being dragged
         if (!draggingObject && lerpingToLastPosition)

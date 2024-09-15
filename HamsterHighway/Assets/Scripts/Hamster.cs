@@ -9,8 +9,6 @@ public class Hamster : MonoBehaviour
 {
     private Rigidbody rb;
 
-    private ScrollRect scrollRect;
-
     [SerializeField] private float maxNaturalForwardSpeed = 2.0f;
     [SerializeField] private float minimumForwardSpeed = 1.0f;
 
@@ -32,12 +30,10 @@ public class Hamster : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-        scrollRect = GameObject.Find("Scroll View").GetComponent<ScrollRect>();
-
         ConstantForce constantForce = gameObject.AddComponent<ConstantForce>();
         constantForce.force = new Vector3(3, 0, 0);
 
-        startX = transform.position.x - scrollRect.viewport.position.x;
+        startX = transform.position.x;
     }
 
     private void FixedUpdate()
@@ -82,19 +78,15 @@ public class Hamster : MonoBehaviour
             SceneManager.LoadScene("GameOver");
         }
 
-        // Compensate for scrolling
-        // Without this, if you scroll at the correct speed to make the hamster stationary on the screen, the game will end
-        Vector3 unscrolledPosition = transform.position - scrollRect.viewport.position;
-
-        if ((unscrolledPosition - previousPosition).magnitude / Time.fixedDeltaTime < loseSpeedFactor * minimumForwardSpeed)
+        if ((transform.position - previousPosition).magnitude / Time.fixedDeltaTime < loseSpeedFactor * minimumForwardSpeed)
         {
             // got stuck on something, game over
-            Debug.Log($"Game Over: Stuck. Movement: {(unscrolledPosition - previousPosition) / Time.fixedDeltaTime} Speed: {(unscrolledPosition - previousPosition).magnitude / Time.fixedDeltaTime}");
+            Debug.Log($"Game Over: Stuck. Movement: {(transform.position - previousPosition) / Time.fixedDeltaTime} Speed: {(transform.position - previousPosition).magnitude / Time.fixedDeltaTime}");
             SceneManager.LoadScene("GameOver");
         }
 
-        previousPosition = unscrolledPosition;
-        ScoreTracker.Instance.score = Mathf.RoundToInt(transform.position.x - scrollRect.viewport.position.x - startX);
+        previousPosition = transform.position;
+        ScoreTracker.Instance.score = Mathf.RoundToInt(transform.position.x - startX);
         scoreText.text = $"Score: {ScoreTracker.Instance.score}";
     }
 

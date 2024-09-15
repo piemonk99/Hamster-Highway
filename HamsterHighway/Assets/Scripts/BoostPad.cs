@@ -10,15 +10,19 @@ public class BoostPad : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Rigidbody rb = other.gameObject.GetComponent<Rigidbody>();
+
+        if (rb == null)
+            return;
+
         switch(direction)
         {
             case Direction.Up:
-                other.gameObject.GetComponent<Rigidbody>().AddForce(new Vector3(0, 450f * boostForceMultiplier, 0));
+                rb.AddForce(new Vector3(0, 450f * boostForceMultiplier, 0));
                 break;
             case Direction.Forward:
-                other.gameObject.GetComponent<Rigidbody>().AddForce(new Vector3(450f * boostForceMultiplier, 0, 0));
+                rb.AddForce(new Vector3(450f * boostForceMultiplier, 0, 0));
                 break;
         }
-        
     }
 }

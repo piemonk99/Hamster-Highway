@@ -5,7 +5,6 @@ using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private Transform viewport;
     [SerializeField] private Transform ball;
 
     [SerializeField] private GameObject startSubLevelPrefab;
@@ -29,8 +28,8 @@ public class GameManager : MonoBehaviour
         for (int i = 1; i < subLevelsToLoadAtOnce; i++)
         {
             int randomLevelIndex = Random.Range(0, subLevelPrefabs.Length);
-            GameObject newSubLevel = Instantiate(subLevelPrefabs[randomLevelIndex], viewport);
-            newSubLevel.transform.localPosition = new Vector3(i * 16, 0, 0);
+            GameObject newSubLevel = Instantiate(subLevelPrefabs[randomLevelIndex]);
+            newSubLevel.transform.position = new Vector3(i * 16, 0, 0);
 
             subLevelQueue.Enqueue(newSubLevel);
         }
@@ -42,13 +41,13 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         //Check ball's progress and spawn more of the level every time it goes the length of a level
-        subLevelBallIsIn = (int)(ball.localPosition.x / 16f);
+        subLevelBallIsIn = (int)(ball.position.x / 16f);
 
         while (subLevelBallIsIn >= currentLevelCenter)
         {
             int randomLevelIndex = Random.Range(0, subLevelPrefabs.Length);
-            GameObject newSubLevel = Instantiate(subLevelPrefabs[randomLevelIndex], viewport);
-            newSubLevel.transform.localPosition = new Vector3((currentLevelCenter + (subLevelsToLoadAtOnce / 2)) * 16, 0, 0);
+            GameObject newSubLevel = Instantiate(subLevelPrefabs[randomLevelIndex]);
+            newSubLevel.transform.position = new Vector3((currentLevelCenter + (subLevelsToLoadAtOnce / 2)) * 16, 0, 0);
 
             subLevelQueue.Enqueue(newSubLevel);
             Destroy(subLevelQueue.Dequeue());

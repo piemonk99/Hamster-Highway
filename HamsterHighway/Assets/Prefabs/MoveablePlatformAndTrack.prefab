@@ -16,13 +16,14 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &7446654531890618571
-RectTransform:
+--- !u!4 &7446654531890618571
+Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 277050056541208572}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -31,11 +32,6 @@ RectTransform:
   - {fileID: 4672245063192585224}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &8881490160177359029
 GameObject:
   m_ObjectHideFlags: 0
@@ -55,13 +51,14 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &4672245063192585224
-RectTransform:
+--- !u!4 &4672245063192585224
+Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8881490160177359029}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 4, y: 0.5, z: 1}
@@ -71,11 +68,6 @@ RectTransform:
   - {fileID: 888565637164764778}
   m_Father: {fileID: 7446654531890618571}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!65 &3403132830197507093
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -110,7 +102,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   trackEndPrefab: {fileID: 1208767583736393134, guid: e6a5be8bafb9da64d94dc3fb8b1f2de9, type: 3}
-  trackPlatformConnectorPrefab: {fileID: 3446504896313212315, guid: d5291d16b171bda4eacba9510f217316, type: 3}
   trackObjectPrefab: {fileID: 1326791533504050193, guid: 9dee6a98baebbc0489a37e0f486aaedd, type: 3}
   moveableType: 0
   forwardMaxDistance: 2

@@ -8,8 +8,6 @@ public class MoveableObject : MonoBehaviour
     private Camera mainCamera;
     private Track platformTrack;
 
-    private ScrollRect scrollRect;
-
     [SerializeField] private GameObject trackEndPrefab;
     [SerializeField] private GameObject trackObjectPrefab;
 
@@ -29,8 +27,6 @@ public class MoveableObject : MonoBehaviour
 
     private void Start()
     {
-        scrollRect = GameObject.Find("Scroll View").GetComponent<ScrollRect>();
-
         rb = GetComponent<Rigidbody>();
 
         mainCamera = Camera.main;
@@ -61,7 +57,7 @@ public class MoveableObject : MonoBehaviour
         if (!draggingObject)
         {
             draggingObject = true;
-            scrollRect.horizontal = false;
+            mainCamera.GetComponent<CameraController>().MayDrag = false;
             movingToDestination = false; // Stop automatic lerping when user drags
         }
 
@@ -75,7 +71,7 @@ public class MoveableObject : MonoBehaviour
         {
             case MoveableTypes.Horizontal:
                 newPosition.x = worldPosition.x;
-                newPosition.x = Mathf.Clamp(newPosition.x, initialPosition.x - backwardMaxDistance + scrollRect.viewport.position.x, initialPosition.x + forwardMaxDistance + scrollRect.viewport.position.x);
+                newPosition.x = Mathf.Clamp(newPosition.x, initialPosition.x - backwardMaxDistance, initialPosition.x + forwardMaxDistance);
                 break;
 
             case MoveableTypes.Vertical:
@@ -112,7 +108,7 @@ public class MoveableObject : MonoBehaviour
         if (draggingObject)
         {
             draggingObject = false;
-            scrollRect.horizontal = true;
+            mainCamera.GetComponent<CameraController>().MayDrag = true;
             movingToDestination = true; // Continue moving to the destination after mouse release
         }
     }
