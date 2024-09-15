@@ -35,7 +35,7 @@ public class Hamster : MonoBehaviour
         scrollRect = GameObject.Find("Scroll View").GetComponent<ScrollRect>();
 
         ConstantForce constantForce = gameObject.AddComponent<ConstantForce>();
-        constantForce.force = new Vector3(1, 0, 0);
+        constantForce.force = new Vector3(3, 0, 0);
 
         startX = transform.position.x - scrollRect.viewport.position.x;
     }
@@ -56,9 +56,13 @@ public class Hamster : MonoBehaviour
             velocity.x = minSpeed;
             rb.velocity = velocity;
         }
+        else if (velocity.x > minSpeed && velocity.x < maxNaturalForwardSpeed)
+        {
+            GetComponent<ConstantForce>().force = new Vector3(3, 0, 0);
+        }
         else if (velocity.x > maxNaturalForwardSpeed)
         {
-            GetComponent<ConstantForce>().force = new Vector3(-1, 0, 0);
+            GetComponent<ConstantForce>().force = new Vector3(0, 0, 0);
         }
 
         if (transform.position.y < loseBelowY)
