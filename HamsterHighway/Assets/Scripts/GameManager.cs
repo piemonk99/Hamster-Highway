@@ -41,17 +41,14 @@ public class GameManager : MonoBehaviour
         //Check ball's progress and spawn more of the level every time it goes the length of a level
         subLevelBallIsIn = (int)(ball.localPosition.x / 16f);
 
-
-        // Debug.Log($"{subLevelBallIsIn} > {currentLevelCenter}? {subLevelBallIsIn > currentLevelCenter}");
-        while (subLevelBallIsIn > currentLevelCenter)
+        while (subLevelBallIsIn >= currentLevelCenter)
         {
             int randomLevelIndex = Random.Range(0, subLevelPrefabs.Length);
             GameObject newSubLevel = Instantiate(subLevelPrefabs[randomLevelIndex], viewport);
-            newSubLevel.transform.localPosition = new Vector3(currentLevelCenter * (int)(subLevelsToLoadAtOnce / 2f) * 16, 0, 0);
-
-            Debug.Log("Loaded level at x = " + currentLevelCenter * (int)(subLevelsToLoadAtOnce / 2f) * 16);
+            newSubLevel.transform.localPosition = new Vector3((currentLevelCenter + (subLevelsToLoadAtOnce / 2)) * 16, 0, 0);
 
             subLevelQueue.Enqueue(newSubLevel);
+            Destroy(subLevelQueue.Dequeue());
 
             currentLevelCenter++;
         }
