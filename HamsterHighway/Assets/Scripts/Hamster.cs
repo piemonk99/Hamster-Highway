@@ -88,9 +88,9 @@ public class Hamster : MonoBehaviour
         scoreText.text = $"Score: {ScoreTracker.Instance.score}";
     }
 
-    void OnCollisionEnter(Collision other)
+    private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Coin"))
+        if (other.CompareTag("Coin"))
         {
             ++ScoreTracker.Instance.coins;
             coinsText.text = $"Coins: {ScoreTracker.Instance.coins}";

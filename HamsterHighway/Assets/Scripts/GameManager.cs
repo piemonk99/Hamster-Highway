@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
         currentLevelCenter = (int)(subLevelsToLoadAtOnce / 2f);
 
         subLevelQueue = new Queue<GameObject>();
-        subLevelQueue.Enqueue(Instantiate(startSubLevelPrefab, viewport));
+        //subLevelQueue.Enqueue(Instantiate(startSubLevelPrefab, viewport));
 
         
 

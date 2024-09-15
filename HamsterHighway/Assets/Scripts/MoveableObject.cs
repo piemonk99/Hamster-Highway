@@ -11,7 +11,6 @@ public class MoveableObject : MonoBehaviour
     private ScrollRect scrollRect;
 
     [SerializeField] private GameObject trackEndPrefab;
-    [SerializeField] private GameObject trackPlatformConnectorPrefab;
     [SerializeField] private GameObject trackObjectPrefab;
 
     private enum MoveableTypes { Horizontal = 0, Vertical = 1 }
@@ -46,11 +45,13 @@ public class MoveableObject : MonoBehaviour
         }
         else
         {
+            gameObject.transform.GetChild(0).gameObject.SetActive(false);
+            gameObject.transform.GetChild(1).gameObject.SetActive(true);
+
             backwardDistanceVector = new Vector3(0, backwardMaxDistance, 0);
             forwardDistanceVector = new Vector3(0, forwardMaxDistance, 0);
         }
-        platformTrack = new Track(initialPosition - backwardDistanceVector, initialPosition + forwardDistanceVector, trackEndPrefab, trackPlatformConnectorPrefab, trackObjectPrefab, transform.parent);
-        platformTrack.UpdateConnectorPosition(transform.position);
+        platformTrack = new Track(initialPosition - backwardDistanceVector, initialPosition + forwardDistanceVector, trackEndPrefab, trackObjectPrefab, transform.parent);
 
         destination = transform.position;
     }
@@ -132,6 +133,21 @@ public class MoveableObject : MonoBehaviour
         // float actualSpeed = Mathf.Lerp(rb.velocity.magnitude, acceleration, Time.deltaTime * 8);
         rb.velocity += (destination - transform.position).normalized * acceleration * Time.deltaTime;
 
+
+        if (rb.velocity.magnitude > 3f)
+        {
+            switch (moveableType)
+            {
+                case MoveableTypes.Horizontal:
+                    rb.velocity = new Vector3(Mathf.Clamp(rb.velocity.x, -3f, 3f), 0, 0);
+                    break;
+
+                case MoveableTypes.Vertical:
+                    rb.velocity = new Vector3(0, Mathf.Clamp(rb.velocity.x, 3f, 3f), 0);
+                    break;
+            }
+        }
+
         // // Lerp the platform towards the last position
         // Vector3 lerpedPosition = Vector3.Lerp(transform.position, lastPosition, Time.deltaTime * 8f);
 
@@ -143,8 +159,6 @@ public class MoveableObject : MonoBehaviour
 
         // Update the parent transform's position to match the Rigidbody's position
         transform.position = rb.position;
-
-        platformTrack.UpdateConnectorPosition(transform.position);
 
         // Stop moving if the platform is close enough to the destination
         if (Vector3.Distance(transform.position, destination) <= rb.velocity.magnitude * Time.fixedDeltaTime || ((destination - transform.position).normalized - rb.velocity.normalized).magnitude > 0.01f)
