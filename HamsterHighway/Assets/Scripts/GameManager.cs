@@ -34,6 +34,9 @@ public class GameManager : MonoBehaviour
 
             subLevelQueue.Enqueue(newSubLevel);
         }
+
+        // For starting in Unity editor
+        Options.Read();
     }
 
     private void Update()

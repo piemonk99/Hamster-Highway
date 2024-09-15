@@ -5,9 +5,19 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuController : MonoBehaviour
 {
+    void Start()
+    {
+        Options.Read();
+    }
+
     public void StartButtonClicked()
     {
         SceneManager.LoadScene("InfiniteRunner");
+    }
+
+    public void OptionsButtonClicked()
+    {
+        SceneManager.LoadScene("OptionsMenu");
     }
 
     public void QuitButtonClicked()
