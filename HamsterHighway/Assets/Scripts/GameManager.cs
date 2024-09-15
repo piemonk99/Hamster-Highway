@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
         subLevelBallIsIn = (int)(ball.localPosition.x / 16f);
 
 
-        Debug.Log($"{subLevelBallIsIn} > {currentLevelCenter}? {subLevelBallIsIn > currentLevelCenter}");
+        // Debug.Log($"{subLevelBallIsIn} > {currentLevelCenter}? {subLevelBallIsIn > currentLevelCenter}");
         while (subLevelBallIsIn > currentLevelCenter)
         {
             int randomLevelIndex = Random.Range(0, subLevelPrefabs.Length);
