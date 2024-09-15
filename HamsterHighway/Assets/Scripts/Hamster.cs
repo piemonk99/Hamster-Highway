@@ -21,11 +21,13 @@ public class Hamster : MonoBehaviour
     [SerializeField] private float accelerometerMaxSpeed = 1.5f;
 
     [SerializeField] private TextMeshProUGUI debugText;
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI coinsText;
 
-    // private float previousYPosition;
     private Vector3 previousPosition;
+    private float startX;
 
-    private void Awake()
+    private void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
@@ -34,11 +36,8 @@ public class Hamster : MonoBehaviour
 
         ConstantForce constantForce = gameObject.AddComponent<ConstantForce>();
         constantForce.force = new Vector3(1, 0, 0);
-    }
 
-    private void Start()
-    {
-        // previousYPosition = rigidbody.position.y;
+        startX = transform.position.x - scrollRect.viewport.position.x;
     }
 
     private void FixedUpdate()
@@ -66,7 +65,7 @@ public class Hamster : MonoBehaviour
         {
             // fell out of map, game over
             Debug.Log($"Game Over: Fell. Pos: {transform.position} Y: {transform.position.y}");
-            SceneManager.LoadScene("MainMenu");
+            SceneManager.LoadScene("GameOver");
         }
 
         // Compensate for scrolling
@@ -77,9 +76,21 @@ public class Hamster : MonoBehaviour
         {
             // got stuck on something, game over
             Debug.Log($"Game Over: Stuck. Movement: {(unscrolledPosition - previousPosition) / Time.fixedDeltaTime} Speed: {(unscrolledPosition - previousPosition).magnitude / Time.fixedDeltaTime}");
-            SceneManager.LoadScene("MainMenu");
+            SceneManager.LoadScene("GameOver");
         }
 
         previousPosition = unscrolledPosition;
+        ScoreTracker.Instance.score = Mathf.RoundToInt(transform.position.x - scrollRect.viewport.position.x - startX);
+        scoreText.text = $"Score: {ScoreTracker.Instance.score}";
+    }
+
+    void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Coin"))
+        {
+            ++ScoreTracker.Instance.coins;
+            coinsText.text = $"Coins: {ScoreTracker.Instance.coins}";
+            Destroy(other.gameObject);
+        }
     }
 }

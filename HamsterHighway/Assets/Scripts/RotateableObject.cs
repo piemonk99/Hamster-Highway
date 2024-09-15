@@ -24,7 +24,7 @@ public class RotatableObject : MonoBehaviour
     private float lastTargetAngle;
     private bool lerpingToLastPosition;
 
-    private void Awake()
+    private void Start()
     {
         scrollRect = GameObject.Find("Scroll View").GetComponent<ScrollRect>();
         mainCamera = Camera.main;
