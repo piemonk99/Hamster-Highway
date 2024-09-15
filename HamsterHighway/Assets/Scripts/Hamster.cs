@@ -46,8 +46,18 @@ public class Hamster : MonoBehaviour
 
         debugText.text = $"{Input.acceleration}";
 
-        float accelerometer = Input.acceleration.x;
-        minSpeed += accelerometer < 0 ? Mathf.Lerp(accelerometerMinSpeed, 0, -accelerometer) : Mathf.Lerp(0, accelerometerMaxSpeed, accelerometer       );
+        Vector3 accelerometer = Input.acceleration;
+        minSpeed += accelerometer.x < 0 ? Mathf.Lerp(accelerometerMinSpeed, 0, -accelerometer.x) : Mathf.Lerp(0, accelerometerMaxSpeed, accelerometer.x);
+
+        // Gravity inversion, currently very exploitable
+        // Needs a cooldown or something
+        // if (accelerometer.y > 0)
+        // {
+        //     rb.useGravity = false;
+        //     rb.velocity -= Physics.gravity * Time.fixedDeltaTime;
+        // }
+        // else
+        //     rb.useGravity = true;
 
         //Clamps rigidbody's speed up to a minimum and adds force
         Vector3 velocity = rb.velocity;
