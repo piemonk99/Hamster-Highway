@@ -139,11 +139,11 @@ public class MoveableObject : MonoBehaviour
             switch (moveableType)
             {
                 case MoveableTypes.Horizontal:
-                    rb.velocity = new Vector3(Mathf.Clamp(rb.velocity.x, -3f, 3f), 0, 0);
+                    //rb.velocity = new Vector3(Mathf.Clamp(rb.velocity.x, -3f, 3f), 0, 0);
                     break;
 
                 case MoveableTypes.Vertical:
-                    rb.velocity = new Vector3(0, Mathf.Clamp(rb.velocity.x, 3f, 3f), 0);
+                    //rb.velocity = new Vector3(0, Mathf.Clamp(rb.velocity.x, -3f, 3f), 0);
                     break;
             }
         }

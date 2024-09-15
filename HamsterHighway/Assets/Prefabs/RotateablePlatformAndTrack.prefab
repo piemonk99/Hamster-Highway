@@ -149,6 +149,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7517789122553846939}
     m_Modifications:
+    - target: {fileID: 2819248630656121443, guid: 88da62d374f55574caa9e173ce5e86d1, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 4657327445039729857, guid: 88da62d374f55574caa9e173ce5e86d1, type: 3}
       propertyPath: m_Name
       value: RotatingPlatform
