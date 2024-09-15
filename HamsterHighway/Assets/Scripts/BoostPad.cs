@@ -15,12 +15,14 @@ public class BoostPad : MonoBehaviour
         if (rb == null)
             return;
 
-        switch(direction)
+        switch (direction)
         {
             case Direction.Up:
+                rb.velocity = new Vector3 (rb.velocity.x, 0, rb.velocity.z);
                 rb.AddForce(new Vector3(0, 450f * boostForceMultiplier, 0));
                 break;
             case Direction.Forward:
+                rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
                 rb.AddForce(new Vector3(450f * boostForceMultiplier, 0, 0));
                 break;
         }
