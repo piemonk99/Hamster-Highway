@@ -9,4 +9,9 @@ public class MainMenuController : MonoBehaviour
     {
         SceneManager.LoadScene("InfiniteRunner");
     }
+
+    public void QuitButtonClicked()
+    {
+        Application.Quit();
+    }
 }

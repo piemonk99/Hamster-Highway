@@ -69,15 +69,17 @@ public class Hamster : MonoBehaviour
             SceneManager.LoadScene("MainMenu");
         }
 
-        if ((transform.position - previousPosition).magnitude / Time.fixedDeltaTime < loseSpeedFactor * minimumForwardSpeed)
+        // Compensate for scrolling
+        // Without this, if you scroll at the correct speed to make the hamster stationary on the screen, the game will end
+        Vector3 unscrolledPosition = transform.position - scrollRect.viewport.position;
+
+        if ((unscrolledPosition - previousPosition).magnitude / Time.fixedDeltaTime < loseSpeedFactor * minimumForwardSpeed)
         {
             // got stuck on something, game over
-            Debug.Log($"Game Over: Stuck. Movement: {(transform.position - previousPosition) / Time.fixedDeltaTime} Speed: {(transform.position - previousPosition).magnitude / Time.fixedDeltaTime}");
+            Debug.Log($"Game Over: Stuck. Movement: {(unscrolledPosition - previousPosition) / Time.fixedDeltaTime} Speed: {(unscrolledPosition - previousPosition).magnitude / Time.fixedDeltaTime}");
             SceneManager.LoadScene("MainMenu");
         }
 
-        // FIXME: Needs to compensate for scrolling
-        // Otherwise, if you scroll at the correct speed to make the hamster stationary on the screen, the game will end
-        previousPosition = transform.position;
+        previousPosition = unscrolledPosition;
     }
 }
