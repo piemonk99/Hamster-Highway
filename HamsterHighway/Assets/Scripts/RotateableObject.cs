@@ -17,11 +17,12 @@ public class RotatableObject : MonoBehaviour
 
     [SerializeField] private float acceleration = 30f; // The angular acceleration the platform applies to move towards its destination
 
-    private Vector3 initialPivotPoint;
     private Vector3 pivotPoint;
     private Vector3 radiusVector;
     private Vector3 destination;
     private bool movingToDestination;
+
+    private Vector3 mouseDownPosition;
 
     private Rigidbody rb;
 
@@ -33,12 +34,13 @@ public class RotatableObject : MonoBehaviour
 
         //Gets pivot point and radius
         radiusVector = new Vector3(transform.localScale.x / 2, 0, 0);
-        initialPivotPoint = -radiusVector;
+        pivotPoint = transform.position - radiusVector;
+        rb.centerOfMass = -radiusVector;
 
         destination = Quaternion.Euler(0, 0, Mathf.Clamp(startingAngle, -backwardMaxAngle, forwardMaxAngle)) * Vector3.right;
 
         //Creates track
-        platformTrack = new Track(transform.position + initialPivotPoint, transform.localScale.x, forwardMaxAngle, backwardMaxAngle, trackEndPrefab, trackObjectPrefab, transform.parent);
+        platformTrack = new Track(pivotPoint, transform.localScale.x, forwardMaxAngle, backwardMaxAngle, trackEndPrefab, trackObjectPrefab, transform.parent);
 
         movingToDestination = true;
     }
@@ -52,13 +54,12 @@ public class RotatableObject : MonoBehaviour
             movingToDestination = false;
         }
 
-        HandleRotation();
+        HandleRotation(mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f)));
     }
 
-    private void HandleRotation()
+    private void HandleRotation(Vector3 worldPosition)
     {
-        Vector3 mouseWorldPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f));
-        Vector3 directionFromPivot = mouseWorldPosition - rb.worldCenterOfMass;
+        Vector3 directionFromPivot = worldPosition - pivotPoint;
         float targetAngle = Mathf.Atan2(directionFromPivot.y, directionFromPivot.x) * Mathf.Rad2Deg;
 
         //Clamp the target angle within the allowed range
@@ -85,7 +86,29 @@ public class RotatableObject : MonoBehaviour
 
     private void Update()
     {
-        pivotPoint = initialPivotPoint;
+        if (!draggingObject)
+        {
+            if (Input.GetMouseButtonDown(0))
+                mouseDownPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            else if (Input.GetMouseButtonUp(0))
+            {
+                Vector3 worldPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+
+                if (Vector3.Distance(mouseDownPosition, worldPosition) < 0.1)
+                {
+                    worldPosition.z = pivotPoint.z;
+                    Vector3 clampedPosition = pivotPoint + (worldPosition - pivotPoint).normalized * transform.localScale.x;
+                    Vector3 directionFromPivot = worldPosition - pivotPoint;
+                    float angle = Mathf.Atan2(directionFromPivot.y, directionFromPivot.x) * Mathf.Rad2Deg;
+
+                    if (angle >= -backwardMaxAngle - 5 && angle <= forwardMaxAngle + 5 && Vector3.Distance(worldPosition, clampedPosition) < 0.3)
+                    {
+                        HandleRotation(clampedPosition);
+                        movingToDestination = true;
+                    }
+                }
+            }
+        }
 
         //Continue lerping to the last target angle if the mouse is not being dragged
         if (draggingObject || movingToDestination)
@@ -97,12 +120,11 @@ public class RotatableObject : MonoBehaviour
     private void MoveToDestination(Vector3 targetDirection)
     {
         rb.constraints = RigidbodyConstraints.FreezePosition;
-        rb.centerOfMass = pivotPoint;
         rb.angularVelocity += new Vector3(0, 0, Mathf.Sign(Vector3.SignedAngle(transform.right, targetDirection, Vector3.forward)) * acceleration * Time.deltaTime);
 
-        if (rb.angularVelocity.magnitude > Mathf.PI / 4)
+        if (rb.angularVelocity.magnitude > Mathf.PI / 2)
         {
-            rb.angularVelocity = new Vector3(0, 0, Mathf.Clamp(rb.angularVelocity.z, -Mathf.PI / 4, Mathf.PI / 4));
+            rb.angularVelocity = new Vector3(0, 0, Mathf.Clamp(rb.angularVelocity.z, -Mathf.PI / 2, Mathf.PI / 2));
         }
 
         //Lerp the current angle to the target angle

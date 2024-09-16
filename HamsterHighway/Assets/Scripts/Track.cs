@@ -81,6 +81,7 @@ public class Track
     }
 }*/
 
+using System;
 using UnityEngine;
 
 public class Track
@@ -118,8 +119,15 @@ public class Track
         trackEndB = GameObject.Instantiate(trackEndPrefab, parent).transform;
         trackEndB.position = CalculateArcPoint(pivotPoint, radius, forwardDegrees);
 
-        //Instantiate the TrackObject and generate the curved shape
-        trackObject = GameObject.Instantiate(trackObjectPrefab, parent).transform;
+        float increment = 0.1f / Vector3.Distance(CalculateArcPoint(Vector3.zero, radius, 0), CalculateArcPoint(Vector3.zero, radius, 1));
+
+        for (float progress = -backwardDegrees + increment * 2; progress <= forwardDegrees - increment * 2; progress += increment)
+        {
+            // Instantiate the TrackObject and generate the curved shape
+            trackObject = GameObject.Instantiate(trackObjectPrefab, parent).transform;
+            trackObject.position = CalculateArcPoint(pivotPoint, radius, progress);
+            trackObject.rotation = Quaternion.Euler(0, 0, progress);
+        }
     }
 
     private Vector3 CalculateArcPoint(Vector3 pivotPoint, float radius, float angleInDegrees)
