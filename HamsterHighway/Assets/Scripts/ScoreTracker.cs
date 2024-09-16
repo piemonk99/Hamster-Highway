@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [Serializable]
@@ -8,9 +7,9 @@ public class ScoreTracker
 {
     public static ScoreTracker Instance;
 
-    [DoNotSerialize] public int score;
+    [NonSerialized] public int score;
     [SerializeField] public int bestScore;
-    [DoNotSerialize] public int prevBestScore;
+    [NonSerialized] public int prevBestScore;
     [SerializeField] public int coins;
 
     public static void Read()

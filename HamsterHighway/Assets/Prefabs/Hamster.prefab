@@ -145,6 +145,7 @@ MonoBehaviour:
   debugText: {fileID: 0}
   scoreText: {fileID: 0}
   coinsText: {fileID: 0}
+  coinSound: {fileID: 8300000, guid: 69265be8f703e81469329deaceafb7ae, type: 3}
 --- !u!135 &6621925518670936274
 SphereCollider:
   m_ObjectHideFlags: 0

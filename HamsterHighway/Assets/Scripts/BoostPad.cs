@@ -6,17 +6,24 @@ public class BoostPad : MonoBehaviour
 {
     [SerializeField] private float boostForceMultiplier = 1f;
     private Animator animator;
+    private AudioSource audioSource;
 
     private enum Direction { Up = 0, Forward = 1 }
     [SerializeField] private Direction direction = Direction.Up;
 
+    private bool used;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        if (used)
+            return;
+
         Rigidbody rb = other.gameObject.GetComponent<Rigidbody>();
 
         if (rb == null)
@@ -37,5 +44,10 @@ public class BoostPad : MonoBehaviour
         //Plays appropriate animation depending on boost pad type
         if (animator.HasState(0, Animator.StringToHash("Bounce"))) animator.Play("Bounce");
         else animator.Play("Strong Bounce");
+
+        audioSource.volume = Options.Instance.Volume;
+        audioSource.Play();
+
+        used = true;
     }
 }

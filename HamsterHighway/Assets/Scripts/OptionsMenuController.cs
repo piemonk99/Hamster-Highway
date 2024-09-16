@@ -25,6 +25,7 @@ public class OptionsMenuController   : MonoBehaviour
     public void ResetBestScoreButtonClicked()
     {
         ScoreTracker.Instance.bestScore = 0;
+        ScoreTracker.Instance.Write();
     }
 
     public void BackButtonClicked()

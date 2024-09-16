@@ -22,6 +22,8 @@ public class Hamster : MonoBehaviour
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI coinsText;
 
+    [SerializeField] private AudioClip coinSound;
+
     private Vector3 previousPosition;
     private float startX;
 
@@ -96,6 +98,7 @@ public class Hamster : MonoBehaviour
         {
             ++ScoreTracker.Instance.coins;
             coinsText.text = $"Coins: {ScoreTracker.Instance.coins}";
+            AudioClipPlayer.PlayClipAtPoint(coinSound, other.gameObject.transform.position);
             Destroy(other.gameObject);
         }
     }
