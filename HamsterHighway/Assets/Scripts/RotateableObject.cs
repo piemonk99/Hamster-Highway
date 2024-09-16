@@ -11,14 +11,14 @@ public class RotatableObject : MonoBehaviour
     [SerializeField] private GameObject trackEndPrefab;
     [SerializeField] private GameObject trackObjectPrefab;
 
-    [SerializeField] private float forwardMaxAngle = 90f;
-    [SerializeField] private float backwardMaxAngle = 90f;
-    [SerializeField] private float startingAngle = 0f;
+    [SerializeField] public float forwardMaxAngle = 90f;
+    [SerializeField] public float backwardMaxAngle = 90f;
+    [SerializeField] public float startingAngle = 0f;
 
     private Vector3 initialPivotPoint;
     private Vector3 pivotPoint;
     private Vector3 radiusVector;
-    private float currentAngle;
+    public float currentAngle;
     private float lastTargetAngle;
     private bool lerpingToLastPosition;
 

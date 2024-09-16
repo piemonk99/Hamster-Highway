@@ -11,11 +11,11 @@ public class MoveableObject : MonoBehaviour
     [SerializeField] private GameObject trackEndPrefab;
     [SerializeField] private GameObject trackObjectPrefab;
 
-    private enum MoveableTypes { Horizontal = 0, Vertical = 1 }
-    [SerializeField] private MoveableTypes moveableType = MoveableTypes.Horizontal;
+    public enum MoveableTypes { Horizontal = 0, Vertical = 1 }
+    [SerializeField] public MoveableTypes moveableType = MoveableTypes.Horizontal;
 
-    [SerializeField] private float forwardMaxDistance = 2f; // Max distance in positive direction
-    [SerializeField] private float backwardMaxDistance = 2f; // Max distance in negative direction
+    [SerializeField] public float forwardMaxDistance = 2f; // Max distance in positive direction
+    [SerializeField] public float backwardMaxDistance = 2f; // Max distance in negative direction
 
     [SerializeField] private float acceleration = 30f; // The acceleration the platform applies to move towards its destination
 
