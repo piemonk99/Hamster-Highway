@@ -130,6 +130,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 990662375559756159, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1098261472708369472, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1098261472708369472, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1098261472708369472, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -170,9 +182,37 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3213230701085038184, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426722520464590490, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4500822696177487722, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5037640952842618296, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 5585010739659859023, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7027571760552252951, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
       propertyPath: m_Name
       value: TestSublevel
+      objectReference: {fileID: 0}
+    - target: {fileID: 7052777054935068573, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8995344209774695533, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -852,6 +892,7 @@ MonoBehaviour:
   subLevelPrefabs:
   - {fileID: 2254665384115040524, guid: 3137a3e6f48203e438161718124ca0ae, type: 3}
   - {fileID: 2972924574791439986, guid: dad7f671bec8d4640af19c92c2056ff7, type: 3}
+  - {fileID: 3012176783001724933, guid: a607f01c6928fe84abba949916672031, type: 3}
   subLevelsToLoadAtOnce: 10
 --- !u!4 &1832336976
 Transform:
@@ -1268,7 +1309,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7468051311145551870, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
       propertyPath: m_Drag
-      value: 0.6
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 7468051311145551870, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
       propertyPath: m_Constraints

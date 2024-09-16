@@ -677,6 +677,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: MoveablePlatformAndTrack
       objectReference: {fileID: 0}
+    - target: {fileID: 638467261060512476, guid: 38063e1cf7fc8ec4f9196a38a68352ce, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 638467261060512476, guid: 38063e1cf7fc8ec4f9196a38a68352ce, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.112
+      objectReference: {fileID: 0}
     - target: {fileID: 3196633005349272720, guid: 38063e1cf7fc8ec4f9196a38a68352ce, type: 3}
       propertyPath: m_Interpolate
       value: 0
