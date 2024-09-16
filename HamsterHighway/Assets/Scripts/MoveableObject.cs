@@ -130,16 +130,16 @@ public class MoveableObject : MonoBehaviour
         rb.velocity += (destination - transform.position).normalized * acceleration * Time.deltaTime;
 
 
-        if (rb.velocity.magnitude > 3f)
+        if (rb.velocity.magnitude > 8f)
         {
             switch (moveableType)
             {
                 case MoveableTypes.Horizontal:
-                    //rb.velocity = new Vector3(Mathf.Clamp(rb.velocity.x, -3f, 3f), 0, 0);
+                    rb.velocity = new Vector3(Mathf.Clamp(rb.velocity.x, -8f, 8f), 0, 0);
                     break;
 
                 case MoveableTypes.Vertical:
-                    //rb.velocity = new Vector3(0, Mathf.Clamp(rb.velocity.x, -3f, 3f), 0);
+                    rb.velocity = new Vector3(0, Mathf.Clamp(rb.velocity.y, -8f, 8f), 0);
                     break;
             }
         }

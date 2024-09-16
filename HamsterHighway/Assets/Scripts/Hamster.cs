@@ -47,13 +47,13 @@ public class Hamster : MonoBehaviour
 
         // Gravity inversion, currently very exploitable
         // Needs a cooldown or something
-        // if (accelerometer.y > 0)
-        // {
-        //     rb.useGravity = false;
-        //     rb.velocity -= Physics.gravity * Time.fixedDeltaTime;
-        // }
-        // else
-        //     rb.useGravity = true;
+        if (accelerometer.y > 0)
+        {
+            rb.useGravity = false;
+            rb.velocity -= Physics.gravity * Time.fixedDeltaTime;
+        }
+        else
+            rb.useGravity = true;
 
         //Clamps rigidbody's speed up to a minimum and adds force
         Vector3 velocity = rb.velocity;
