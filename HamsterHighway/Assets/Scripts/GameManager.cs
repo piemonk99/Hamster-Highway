@@ -95,11 +95,11 @@ public class GameManager : MonoBehaviour
     private void InvertMoveables(Transform subLevel)
     {
         // Find all MoveablePlatformAndTrack and MoveableWallAndTrack objects in the subLevel
-        foreach (Transform moveable in subLevel.GetComponentsInChildren<Transform>())
+        foreach (Transform interactable in subLevel.GetComponentsInChildren<Transform>())
         {
-            if (moveable.name == "MoveablePlatformAndTrack" || moveable.name == "MoveableWallAndTrack")
+            if (interactable.name == "MoveablePlatformAndTrack" || interactable.name == "MoveableWallAndTrack")
             {
-                Transform moveableChild = moveable.Find("MoveablePlatform") ?? moveable.Find("MoveableWall");
+                Transform moveableChild = interactable.Find("MoveablePlatform") ?? interactable.Find("MoveableWall");
 
                 if (moveableChild != null)
                 {
@@ -113,9 +113,9 @@ public class GameManager : MonoBehaviour
                     }
                 }
             }
-            else if (moveable.name == "RotatablePlatformAndTrack") // Handle rotational platforms
+            else if (interactable.name == "RotateablePlatformAndTrack") // Handle rotational platforms
             {
-                RotatableObject rotatableScript = moveable.Find("RotatablePlatform")?.GetComponent<RotatableObject>();
+                RotatableObject rotatableScript = interactable.Find("RotateablePlatform")?.GetComponent<RotatableObject>();
                 if (rotatableScript != null)
                 {
                     // Swap forward and backward angles
@@ -126,6 +126,16 @@ public class GameManager : MonoBehaviour
                     // Invert the starting angle
                     rotatableScript.startingAngle *= -1;
                     rotatableScript.currentAngle *= -1;
+
+                }
+            }
+            else if (interactable.name == "Booster Pad" || interactable.name == "Strong Booster Pad")
+            {
+                BoostPad boostPadScript = interactable.Find("BoostPad")?.GetComponent<BoostPad>();
+                if (boostPadScript != null )
+                {
+                    if (boostPadScript.direction == BoostPad.Direction.Up) boostPadScript.direction = BoostPad.Direction.Down;
+                    if (boostPadScript.direction == BoostPad.Direction.Down) boostPadScript.direction = BoostPad.Direction.Up;
                 }
             }
         }

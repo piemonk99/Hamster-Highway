@@ -8,8 +8,8 @@ public class BoostPad : MonoBehaviour
     private Animator animator;
     private AudioSource audioSource;
 
-    private enum Direction { Up = 0, Forward = 1, Down = 2 }
-    [SerializeField] private Direction direction = Direction.Up;
+    public enum Direction { Up = 0, Forward = 1, Down = 2 }
+    [SerializeField] public Direction direction = Direction.Up;
 
     private bool used;
 

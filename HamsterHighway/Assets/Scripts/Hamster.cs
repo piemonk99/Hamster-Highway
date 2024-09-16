@@ -90,6 +90,8 @@ public class Hamster : MonoBehaviour
         previousPosition = transform.position;
         ScoreTracker.Instance.score = Mathf.RoundToInt(transform.position.x - startX);
         scoreText.text = $"Score: {ScoreTracker.Instance.score}";
+
+        CorrectHamsterRotation();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -122,6 +124,21 @@ public class Hamster : MonoBehaviour
         // Need to write even when best score does not change to save coins
         ScoreTracker.Instance.Write();
         SceneManager.LoadScene("GameOver");
+
+    }
+
+    private void CorrectHamsterRotation()
+    {
+        /*foreach(Transform childObject in transform.GetComponentsInChildren<Transform>())
+        {
+            if (childObject.name == "Hamster") childObject.localRotation = Quaternion.Euler(new Vector3(0, 90, transform.localRotation.z));
+        }*/
+
+        transform.GetChild(0).rotation = Quaternion.Euler(new Vector3(0, -90, transform.localRotation.z));
+    }
+
+    private void PlayCorrectAnimation()
+    {
 
     }
 }
