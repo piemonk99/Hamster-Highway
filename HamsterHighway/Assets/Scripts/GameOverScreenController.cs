@@ -9,6 +9,10 @@ public class GameOverScreenController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI newBestScoreText;
 
+    [SerializeField] private AudioSource gameOverAudio;
+
+    [SerializeField] private AudioClip newBestScoreClip;
+
     [SerializeField] private float newBestScoreTextFlashSpeed = 1;
 
     void Start()
@@ -16,7 +20,13 @@ public class GameOverScreenController : MonoBehaviour
         scoreText.text = $"Score: {ScoreTracker.Instance.score}";
 
         if (ScoreTracker.Instance.score > ScoreTracker.Instance.prevBestScore)
+        {
             newBestScoreText.gameObject.SetActive(true);
+            gameOverAudio.clip = newBestScoreClip;
+        }
+
+        gameOverAudio.volume = Options.Instance.Volume;
+        gameOverAudio.Play();
     }
 
     void Update()

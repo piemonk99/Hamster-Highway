@@ -20,7 +20,7 @@ public class RotatableObject : MonoBehaviour
     private Vector3 radiusVector;
     public float currentAngle;
     private float lastTargetAngle;
-    private bool lerpingToLastPosition;
+    private bool movingToDestination;
 
     private void Start()
     {
@@ -36,7 +36,7 @@ public class RotatableObject : MonoBehaviour
         //Creates track
         platformTrack = new Track(initialPivotPoint, transform.localScale.x, forwardMaxAngle, backwardMaxAngle, trackEndPrefab, trackObjectPrefab, transform.parent);
 
-        lerpingToLastPosition = true;
+        movingToDestination = true;
     }
 
     public void OnMouseDrag()
@@ -45,7 +45,7 @@ public class RotatableObject : MonoBehaviour
         {
             draggingObject = true;
             mainCamera.GetComponent<CameraController>().MayDrag = false;
-            lerpingToLastPosition = false; //Stop automatic lerping when user drags
+            movingToDestination = false; //Stop automatic lerping when user drags
         }
 
         HandleRotation();
@@ -61,7 +61,7 @@ public class RotatableObject : MonoBehaviour
         float clampedTargetAngle = Mathf.Clamp(targetAngle, -backwardMaxAngle, forwardMaxAngle);
 
         //Move the platform smoothly along the arc
-        LerpToPosition(clampedTargetAngle);
+        MoveToDestination(clampedTargetAngle);
 
         //Store the clamped target angle for when the user lets go
         lastTargetAngle = clampedTargetAngle;
@@ -75,7 +75,7 @@ public class RotatableObject : MonoBehaviour
             mainCamera.GetComponent<CameraController>().MayDrag = true;
 
             //Start lerping to the last position after releasing the mouse
-            lerpingToLastPosition = true;
+            movingToDestination = true;
         }
     }
 
@@ -84,19 +84,13 @@ public class RotatableObject : MonoBehaviour
         pivotPoint = initialPivotPoint;
 
         //Continue lerping to the last target angle if the mouse is not being dragged
-        if (!draggingObject && lerpingToLastPosition)
+        if (!draggingObject && movingToDestination)
         {
-            LerpToPosition(lastTargetAngle);
-
-            //Stop lerping if we are close enough to the last target angle
-            if (Mathf.Abs(currentAngle - lastTargetAngle) < 0.1f)
-            {
-                lerpingToLastPosition = false;
-            }
+            MoveToDestination(lastTargetAngle);
         }
     }
 
-    private void LerpToPosition(float targetAngle)
+    private void MoveToDestination(float targetAngle)
     {
         //Lerp the current angle to the target angle
         currentAngle = Mathf.Lerp(currentAngle, targetAngle, Time.deltaTime * 8f);
@@ -112,5 +106,11 @@ public class RotatableObject : MonoBehaviour
         //Rotate the platform to match the current angle
         Quaternion targetRotation = Quaternion.AngleAxis(currentAngle, Vector3.forward);
         transform.rotation = targetRotation;
+
+        //Stop lerping if we are close enough to the last target angle
+        if (Mathf.Abs(currentAngle - lastTargetAngle) < 0.1f)
+        {
+            movingToDestination = false;
+        }
     }
 }

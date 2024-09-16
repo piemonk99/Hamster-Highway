@@ -26,6 +26,7 @@ public class Hamster : MonoBehaviour
 
     private Vector3 previousPosition;
     private float startX;
+    private bool invertedGravity;
 
     private void Start()
     {
@@ -47,9 +48,13 @@ public class Hamster : MonoBehaviour
         Vector3 accelerometer = Input.acceleration;
         minSpeed += accelerometer.x < 0 ? Mathf.Lerp(accelerometerMinSpeed, 0, -accelerometer.x) : Mathf.Lerp(0, accelerometerMaxSpeed, accelerometer.x);
 
-        // Gravity inversion, currently very exploitable
-        // Needs a cooldown or something
-        if (accelerometer.y > 0)
+        if (accelerometer.y > 0.75)
+            invertedGravity = true;
+        else if (accelerometer.y < 0.75)
+            invertedGravity = false;
+
+        // Gravity inversion
+        if (invertedGravity)
         {
             rb.useGravity = false;
             rb.velocity -= Physics.gravity * Time.fixedDeltaTime;
@@ -109,22 +114,21 @@ public class Hamster : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Hazard"))
         {
+            Debug.Log($"Game Over: Hazard.");
             GameOver();
         }
     }
 
     private void GameOver()
     {
+        ScoreTracker.Instance.prevBestScore = ScoreTracker.Instance.bestScore;
+
         if (ScoreTracker.Instance.score > ScoreTracker.Instance.bestScore)
-        {
-            ScoreTracker.Instance.prevBestScore = ScoreTracker.Instance.bestScore;
             ScoreTracker.Instance.bestScore = ScoreTracker.Instance.score;
-        }
 
         // Need to write even when best score does not change to save coins
         ScoreTracker.Instance.Write();
         SceneManager.LoadScene("GameOver");
-
     }
 
     private void CorrectHamsterRotation()
