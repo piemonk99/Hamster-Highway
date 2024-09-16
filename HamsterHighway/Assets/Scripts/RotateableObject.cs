@@ -52,7 +52,6 @@ public class RotatableObject : MonoBehaviour
             movingToDestination = false;
         }
 
-        debugging = true;
         HandleRotation();
     }
 
