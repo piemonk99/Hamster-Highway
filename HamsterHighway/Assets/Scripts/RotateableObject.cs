@@ -15,26 +15,30 @@ public class RotatableObject : MonoBehaviour
     [SerializeField] public float backwardMaxAngle = 90f;
     [SerializeField] public float startingAngle = 0f;
 
+    [SerializeField] private float acceleration = 30f; // The angular acceleration the platform applies to move towards its destination
+
     private Vector3 initialPivotPoint;
     private Vector3 pivotPoint;
     private Vector3 radiusVector;
-    public float currentAngle;
-    private float lastTargetAngle;
+    private Vector3 destination;
     private bool movingToDestination;
+
+    private Rigidbody rb;
 
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
+
         mainCamera = Camera.main;
 
         //Gets pivot point and radius
         radiusVector = new Vector3(transform.localScale.x / 2, 0, 0);
-        initialPivotPoint = transform.position - radiusVector;
+        initialPivotPoint = -radiusVector;
 
-        currentAngle = Mathf.Clamp(startingAngle, -backwardMaxAngle, forwardMaxAngle);
-        lastTargetAngle = currentAngle;
+        destination = Quaternion.Euler(0, 0, Mathf.Clamp(startingAngle, -backwardMaxAngle, forwardMaxAngle)) * Vector3.right;
 
         //Creates track
-        platformTrack = new Track(initialPivotPoint, transform.localScale.x, forwardMaxAngle, backwardMaxAngle, trackEndPrefab, trackObjectPrefab, transform.parent);
+        platformTrack = new Track(transform.position + initialPivotPoint, transform.localScale.x, forwardMaxAngle, backwardMaxAngle, trackEndPrefab, trackObjectPrefab, transform.parent);
 
         movingToDestination = true;
     }
@@ -45,26 +49,27 @@ public class RotatableObject : MonoBehaviour
         {
             draggingObject = true;
             mainCamera.GetComponent<CameraController>().MayDrag = false;
-            movingToDestination = false; //Stop automatic lerping when user drags
+            movingToDestination = false;
         }
 
+        debugging = true;
         HandleRotation();
     }
 
     private void HandleRotation()
     {
         Vector3 mouseWorldPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f));
-        Vector3 directionFromPivot = mouseWorldPosition - pivotPoint;
+        Vector3 directionFromPivot = mouseWorldPosition - rb.worldCenterOfMass;
         float targetAngle = Mathf.Atan2(directionFromPivot.y, directionFromPivot.x) * Mathf.Rad2Deg;
 
         //Clamp the target angle within the allowed range
         float clampedTargetAngle = Mathf.Clamp(targetAngle, -backwardMaxAngle, forwardMaxAngle);
 
         //Move the platform smoothly along the arc
-        MoveToDestination(clampedTargetAngle);
+        // MoveToDestination(clampedTargetAngle);
 
         //Store the clamped target angle for when the user lets go
-        lastTargetAngle = clampedTargetAngle;
+        destination = Quaternion.Euler(0, 0, clampedTargetAngle) * Vector3.right;
     }
 
     public void OnMouseUp()
@@ -84,32 +89,42 @@ public class RotatableObject : MonoBehaviour
         pivotPoint = initialPivotPoint;
 
         //Continue lerping to the last target angle if the mouse is not being dragged
-        if (!draggingObject && movingToDestination)
+        if (draggingObject || movingToDestination)
         {
-            MoveToDestination(lastTargetAngle);
+            MoveToDestination(destination);
         }
     }
 
-    private void MoveToDestination(float targetAngle)
+    private void MoveToDestination(Vector3 targetDirection)
     {
+        rb.constraints = RigidbodyConstraints.FreezePosition;
+        rb.centerOfMass = pivotPoint;
+        rb.angularVelocity += new Vector3(0, 0, Mathf.Sign(Vector3.SignedAngle(transform.right, targetDirection, Vector3.forward)) * acceleration * Time.deltaTime);
+
+        if (rb.angularVelocity.magnitude > Mathf.PI / 4)
+        {
+            rb.angularVelocity = new Vector3(0, 0, Mathf.Clamp(rb.angularVelocity.z, -Mathf.PI / 4, Mathf.PI / 4));
+        }
+
         //Lerp the current angle to the target angle
-        currentAngle = Mathf.Lerp(currentAngle, targetAngle, Time.deltaTime * 8f);
+        // currentAngle = Mathf.Lerp(currentAngle, targetAngle, Time.deltaTime * 8f);
 
         //Calculate the position based on the lerped angle to stay on the arc
         
-        Vector3 rotatedPosition = pivotPoint + (Quaternion.Euler(0, 0, currentAngle) * radiusVector);
-        Rigidbody rb = GetComponent<Rigidbody>();
-        rb.MovePosition(rotatedPosition);
+        // Vector3 rotatedPosition = pivotPoint + (Quaternion.Euler(0, 0, currentAngle) * radiusVector);
+        // rb.MovePosition(rotatedPosition);
 
-        transform.position = rb.position;
+        // transform.position = rb.position;
 
         //Rotate the platform to match the current angle
-        Quaternion targetRotation = Quaternion.AngleAxis(currentAngle, Vector3.forward);
-        transform.rotation = targetRotation;
+        // Quaternion targetRotation = Quaternion.AngleAxis(currentAngle, Vector3.forward);
+        // transform.rotation = targetRotation;
 
         //Stop lerping if we are close enough to the last target angle
-        if (Mathf.Abs(currentAngle - lastTargetAngle) < 0.1f)
+        if (Vector3.Angle(targetDirection, transform.right) <= rb.angularVelocity.z * Mathf.Rad2Deg * Time.fixedDeltaTime)
         {
+            rb.angularVelocity = Vector3.zero;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
             movingToDestination = false;
         }
     }

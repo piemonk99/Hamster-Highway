@@ -48,9 +48,9 @@ public class Hamster : MonoBehaviour
         Vector3 accelerometer = Input.acceleration;
         minSpeed += accelerometer.x < 0 ? Mathf.Lerp(accelerometerMinSpeed, 0, -accelerometer.x) : Mathf.Lerp(0, accelerometerMaxSpeed, accelerometer.x);
 
-        if (accelerometer.y > 0.75)
+        if (accelerometer.y > 0.6)
             invertedGravity = true;
-        else if (accelerometer.y < 0.75)
+        else if (accelerometer.y < 0.6)
             invertedGravity = false;
 
         // Gravity inversion

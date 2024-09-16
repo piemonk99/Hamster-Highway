@@ -994,6 +994,7 @@ MonoBehaviour:
   - {fileID: 4978317053609484475, guid: a795659fe73cf41438d130f7f75aa8e4, type: 3}
   subLevelsToLoadAtOnce: 20
   subLevelsPerGravityInversions: 5
+  doGeneration: 1
 --- !u!4 &1832336976
 Transform:
   m_ObjectHideFlags: 0

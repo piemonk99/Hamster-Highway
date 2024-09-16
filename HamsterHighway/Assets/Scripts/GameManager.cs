@@ -15,6 +15,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int subLevelsToLoadAtOnce = 10;
     [SerializeField] private int subLevelsPerGravityInversions = 5;
 
+    [SerializeField] private bool doGeneration = true;
+
     private bool gravityInverted;
     private int subLevelBallIsIn;
     private int currentLevelCenter;
@@ -26,10 +28,11 @@ public class GameManager : MonoBehaviour
 
         subLevelQueue = new Queue<GameObject>();
 
-        for (int i = 1; i < subLevelsToLoadAtOnce; i++)
-        {
-            subLevelQueue.Enqueue(SpawnNewSubLevel(i));
-        }
+        if (doGeneration)
+            for (int i = 1; i < subLevelsToLoadAtOnce; i++)
+            {
+                subLevelQueue.Enqueue(SpawnNewSubLevel(i));
+            }
 
         // For starting in Unity editor
         Options.Read();
@@ -38,6 +41,9 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        if (!doGeneration)
+            return;
+
         //Check ball's progress and spawn more of the level every time it goes the length of a level
         subLevelBallIsIn = (int)(ball.position.x / 16f);
 
@@ -125,7 +131,7 @@ public class GameManager : MonoBehaviour
 
                     // Invert the starting angle
                     rotatableScript.startingAngle *= -1;
-                    rotatableScript.currentAngle *= -1;
+                    // rotatableScript.currentAngle *= -1;
 
                 }
             }
