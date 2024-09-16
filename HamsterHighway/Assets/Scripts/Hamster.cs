@@ -103,7 +103,14 @@ public class Hamster : MonoBehaviour
         }
     }
 
-<<<<<<< Updated upstream
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Hazard"))
+        {
+            GameOver();
+        }
+    }
+
     private void GameOver()
     {
         if (ScoreTracker.Instance.score > ScoreTracker.Instance.bestScore)
@@ -115,14 +122,6 @@ public class Hamster : MonoBehaviour
         // Need to write even when best score does not change to save coins
         ScoreTracker.Instance.Write();
         SceneManager.LoadScene("GameOver");
-=======
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Hazard"))
-        {
-            Debug.Log($"Game Over: Hazard.");
-            SceneManager.LoadScene("GameOver");
-        }
->>>>>>> Stashed changes
+
     }
 }
