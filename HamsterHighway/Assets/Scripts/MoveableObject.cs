@@ -23,6 +23,8 @@ public class MoveableObject : MonoBehaviour
     private Vector3 destination; // Destination
     private bool movingToDestination; // Flag to check if we should continue lerping after releasing the mouse
 
+    private Vector3 mouseDownPosition;
+
     private Rigidbody rb;
 
     private void Start()
@@ -62,29 +64,10 @@ public class MoveableObject : MonoBehaviour
         }
 
         Vector3 screenPosition = Input.mousePosition;
-        screenPosition.z = 10; // Set the z-distance for screen to world conversion
+        // screenPosition.z = 10; // Set the z-distance for screen to world conversion
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
-        Vector3 newPosition = rb.position;
-
-        switch (moveableType)
-        {
-            case MoveableTypes.Horizontal:
-                newPosition.x = worldPosition.x;
-                newPosition.x = Mathf.Clamp(newPosition.x, initialPosition.x - backwardMaxDistance, initialPosition.x + forwardMaxDistance);
-                break;
-
-            case MoveableTypes.Vertical:
-                newPosition.y = worldPosition.y;
-                newPosition.y = Mathf.Clamp(newPosition.y, initialPosition.y - backwardMaxDistance, initialPosition.y + forwardMaxDistance);
-                break;
-
-            default:
-                newPosition = worldPosition;
-                break;
-        }
-
-        destination = newPosition;
+        destination = ClampToTrack(worldPosition);
 
         // // Get the Rigidbody component
         // Rigidbody rb = GetComponent<Rigidbody>();
@@ -103,6 +86,30 @@ public class MoveableObject : MonoBehaviour
         // lastPosition = newPosition; // Store the last position for use after releasing the mouse
     }
 
+    private Vector3 ClampToTrack(Vector3 position)
+    {
+        Vector3 newPosition = transform.position;
+
+        switch (moveableType)
+        {
+            case MoveableTypes.Horizontal:
+                newPosition.x = position.x;
+                newPosition.x = Mathf.Clamp(newPosition.x, initialPosition.x - backwardMaxDistance, initialPosition.x + forwardMaxDistance);
+                break;
+
+            case MoveableTypes.Vertical:
+                newPosition.y = position.y;
+                newPosition.y = Mathf.Clamp(newPosition.y, initialPosition.y - backwardMaxDistance, initialPosition.y + forwardMaxDistance);
+                break;
+
+            default:
+                newPosition = position;
+                break;
+        }
+
+        return newPosition;
+    }
+
     public void OnMouseUp()
     {
         if (draggingObject)
@@ -115,6 +122,28 @@ public class MoveableObject : MonoBehaviour
 
     private void Update()
     {
+        if (!draggingObject)
+        {
+            if (Input.GetMouseButtonDown(0))
+                mouseDownPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            else if (Input.GetMouseButtonUp(0))
+            {
+                Vector3 worldPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+
+                if (Vector3.Distance(mouseDownPosition, worldPosition) < 0.1)
+                {
+                    worldPosition.z = transform.position.z;
+                    Vector3 clampedPosition = ClampToTrack(worldPosition);
+
+                    if (Vector3.Distance(worldPosition, clampedPosition) < 0.3)
+                    {
+                        destination = clampedPosition;
+                        movingToDestination = true;
+                    }
+                }
+            }
+        }
+
         // Move to the destination
         if (draggingObject || movingToDestination)
         {
