@@ -1,13 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class MainMenuController : MonoBehaviour
 {
+    [SerializeField] private TextMeshProUGUI bestScoreText;
+
     void Start()
     {
         Options.Read();
+        ScoreTracker.Read();
+        bestScoreText.text = $"Best Score: {ScoreTracker.Instance.bestScore}";
     }
 
     public void StartButtonClicked()

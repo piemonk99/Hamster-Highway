@@ -22,6 +22,11 @@ public class OptionsMenuController   : MonoBehaviour
         volumeText.text = $"Volume: {(int) (value * 100)}%";
     }
 
+    public void ResetBestScoreButtonClicked()
+    {
+        ScoreTracker.Instance.bestScore = 0;
+    }
+
     public void BackButtonClicked()
     {
         SceneManager.LoadScene("MainMenu");

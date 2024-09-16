@@ -75,14 +75,14 @@ public class Hamster : MonoBehaviour
         {
             // fell out of map, game over
             Debug.Log($"Game Over: Fell. Pos: {transform.position} Y: {transform.position.y}");
-            SceneManager.LoadScene("GameOver");
+            GameOver();
         }
 
         if ((transform.position - previousPosition).magnitude / Time.fixedDeltaTime < loseSpeedFactor * minimumForwardSpeed)
         {
             // got stuck on something, game over
             Debug.Log($"Game Over: Stuck. Movement: {(transform.position - previousPosition) / Time.fixedDeltaTime} Speed: {(transform.position - previousPosition).magnitude / Time.fixedDeltaTime}");
-            SceneManager.LoadScene("GameOver");
+            GameOver();
         }
 
         previousPosition = transform.position;
@@ -98,5 +98,18 @@ public class Hamster : MonoBehaviour
             coinsText.text = $"Coins: {ScoreTracker.Instance.coins}";
             Destroy(other.gameObject);
         }
+    }
+
+    private void GameOver()
+    {
+        if (ScoreTracker.Instance.score > ScoreTracker.Instance.bestScore)
+        {
+            ScoreTracker.Instance.prevBestScore = ScoreTracker.Instance.bestScore;
+            ScoreTracker.Instance.bestScore = ScoreTracker.Instance.score;
+        }
+
+        // Need to write even when best score does not change to save coins
+        ScoreTracker.Instance.Write();
+        SceneManager.LoadScene("GameOver");
     }
 }

@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
 
         // For starting in Unity editor
         Options.Read();
+        ScoreTracker.Read();
     }
 
     private void Update()
