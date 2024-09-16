@@ -9,11 +9,11 @@ public class RotatableObject : MonoBehaviour
     private Track platformTrack;
 
     [SerializeField] private GameObject trackEndPrefab;
-    [SerializeField] private GameObject trackPlatformConnectorPrefab;
     [SerializeField] private GameObject trackObjectPrefab;
 
     [SerializeField] private float forwardMaxAngle = 90f;
     [SerializeField] private float backwardMaxAngle = 90f;
+    [SerializeField] private float startingAngle = 0f;
 
     private Vector3 initialPivotPoint;
     private Vector3 pivotPoint;
@@ -30,11 +30,13 @@ public class RotatableObject : MonoBehaviour
         radiusVector = new Vector3(transform.localScale.x / 2, 0, 0);
         initialPivotPoint = transform.position - radiusVector;
 
-        currentAngle = 0f;
+        currentAngle = Mathf.Clamp(startingAngle, -backwardMaxAngle, forwardMaxAngle);
         lastTargetAngle = currentAngle;
 
         //Creates track
         platformTrack = new Track(initialPivotPoint, transform.localScale.x, forwardMaxAngle, backwardMaxAngle, trackEndPrefab, trackObjectPrefab, transform.parent);
+
+        lerpingToLastPosition = true;
     }
 
     public void OnMouseDrag()
