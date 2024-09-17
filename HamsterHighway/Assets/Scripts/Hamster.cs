@@ -19,6 +19,8 @@ public class Hamster : MonoBehaviour
     [SerializeField] private float accelerometerMinSpeed = -0.5f;
     [SerializeField] private float accelerometerMaxSpeed = 1.5f;
 
+    [SerializeField] private float yawForce = 1;
+
     [SerializeField] private TextMeshProUGUI debugText;
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI coinsText;
@@ -42,6 +44,8 @@ public class Hamster : MonoBehaviour
         startX = transform.position.x;
 
         initialHamsterScale = transform.Find("Hamster").localScale;
+
+        Input.gyro.enabled = true;
     }
 
     private void FixedUpdate()
@@ -88,6 +92,9 @@ public class Hamster : MonoBehaviour
         {
             GetComponent<ConstantForce>().force = new Vector3(0, 0, 0);
         }
+
+        // Gyro control
+        rb.AddForce(new Vector3(Input.gyro.rotationRate.y * yawForce, 0, 0));
 
         if (transform.position.y < loseBelowY || transform.position.y > loseAboveY)
         {
