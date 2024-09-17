@@ -13,6 +13,7 @@ public class Hamster : MonoBehaviour
     [SerializeField] private float minimumForwardSpeed = 1.0f;
 
     [SerializeField] private float loseBelowY = 0; // If the hamster falls below this Y value, the game ends
+    [SerializeField] private float loseAboveY = 10;
     [SerializeField] private float loseSpeedFactor = 0.05f; // If the hamster's speed drops below this fraction of its minimum forward speed when it collides with something (i.e. it gets stuck on something), the game ends
 
     [SerializeField] private float accelerometerMinSpeed = -0.5f;
@@ -78,7 +79,7 @@ public class Hamster : MonoBehaviour
             GetComponent<ConstantForce>().force = new Vector3(0, 0, 0);
         }
 
-        if (transform.position.y < loseBelowY)
+        if (transform.position.y < loseBelowY || transform.position.y > loseAboveY)
         {
             // fell out of map, game over
             Debug.Log($"Game Over: Fell. Pos: {transform.position} Y: {transform.position.y}");
@@ -133,11 +134,6 @@ public class Hamster : MonoBehaviour
 
     private void CorrectHamsterRotation()
     {
-        /*foreach(Transform childObject in transform.GetComponentsInChildren<Transform>())
-        {
-            if (childObject.name == "Hamster") childObject.localRotation = Quaternion.Euler(new Vector3(0, 90, transform.localRotation.z));
-        }*/
-
         transform.GetChild(0).rotation = Quaternion.Euler(new Vector3(0, -90, transform.localRotation.z));
     }
 
