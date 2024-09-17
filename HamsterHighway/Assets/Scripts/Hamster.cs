@@ -29,11 +29,18 @@ public class Hamster : MonoBehaviour
 
     [SerializeField] private AudioClip coinSound;
 
+    [SerializeField] private Material[] skyboxes;
+
+    [SerializeField] private float skyboxChangeInterval = 100;
+
     private Vector3 previousPosition;
     private float startX;
     private bool invertedGravity;
 
     private Vector3 initialHamsterScale;
+
+    private int skyboxChangeTracker;
+    private int currentSkybox;
 
     private void Start()
     {
@@ -119,6 +126,20 @@ public class Hamster : MonoBehaviour
         scoreText.text = $"Score: {ScoreTracker.Instance.score}";
 
         CorrectHamsterRotation();
+
+        if (progress - skyboxChangeTracker * skyboxChangeInterval > skyboxChangeInterval)
+        {
+            ++skyboxChangeTracker;
+            int temp = currentSkybox;
+
+            do
+            {
+                currentSkybox = Random.Range(0, skyboxes.Length);
+            } while (currentSkybox == temp);
+
+            RenderSettings.skybox = skyboxes[currentSkybox];
+            DynamicGI.UpdateEnvironment();
+        }
     }
 
     private void OnTriggerEnter(Collider other)

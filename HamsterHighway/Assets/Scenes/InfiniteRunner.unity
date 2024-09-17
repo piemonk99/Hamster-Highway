@@ -1497,6 +1497,10 @@ PrefabInstance:
       value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 8769747154265449392, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
+      propertyPath: skyboxes.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8769747154265449392, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
       propertyPath: accelerometerMaxSpeed
       value: 3
       objectReference: {fileID: 0}
@@ -1508,6 +1512,18 @@ PrefabInstance:
       propertyPath: maxNaturalForwardSpeed
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 8769747154265449392, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
+      propertyPath: skyboxes.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 57d1dbff35927394496580e2571ef4cb, type: 2}
+    - target: {fileID: 8769747154265449392, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
+      propertyPath: skyboxes.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8e7506139442a3f47a74c636d7c2e044, type: 2}
+    - target: {fileID: 8769747154265449392, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
+      propertyPath: skyboxes.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: 64458b7272846244e9f2a8084d18f0a4, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 65307968200884977, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
