@@ -12,6 +12,8 @@ public class Hamster : MonoBehaviour
     [SerializeField] private float maxNaturalForwardSpeed = 2.0f;
     [SerializeField] private float minimumForwardSpeed = 1.0f;
 
+    [SerializeField] private float extraSpeedPerScore = 0.005f;
+
     [SerializeField] private float loseBelowY = 0; // If the hamster falls below this Y value, the game ends
     [SerializeField] private float loseAboveY = 10;
     [SerializeField] private float loseSpeedFactor = 0.05f; // If the hamster's speed drops below this fraction of its minimum forward speed when it collides with something (i.e. it gets stuck on something), the game ends
@@ -50,7 +52,9 @@ public class Hamster : MonoBehaviour
 
     private void FixedUpdate()
     {
-        float minSpeed = minimumForwardSpeed;
+        float progress = transform.position.x - startX;
+
+        float minSpeed = minimumForwardSpeed + progress * extraSpeedPerScore;
 
         debugText.text = $"{Input.acceleration}";
 
@@ -88,7 +92,7 @@ public class Hamster : MonoBehaviour
         {
             GetComponent<ConstantForce>().force = new Vector3(3, 0, 0);
         }
-        else if (velocity.x > maxNaturalForwardSpeed)
+        else if (velocity.x > maxNaturalForwardSpeed + progress * extraSpeedPerScore)
         {
             GetComponent<ConstantForce>().force = new Vector3(0, 0, 0);
         }
@@ -111,7 +115,7 @@ public class Hamster : MonoBehaviour
         }
 
         previousPosition = transform.position;
-        ScoreTracker.Instance.score = Mathf.RoundToInt(transform.position.x - startX);
+        ScoreTracker.Instance.score = Mathf.RoundToInt(progress);
         scoreText.text = $"Score: {ScoreTracker.Instance.score}";
 
         CorrectHamsterRotation();
