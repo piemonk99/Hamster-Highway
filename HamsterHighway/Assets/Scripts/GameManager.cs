@@ -141,7 +141,7 @@ public class GameManager : MonoBehaviour
                 if (boostPadScript != null )
                 {
                     if (boostPadScript.direction == BoostPad.Direction.Up) boostPadScript.direction = BoostPad.Direction.Down;
-                    if (boostPadScript.direction == BoostPad.Direction.Down) boostPadScript.direction = BoostPad.Direction.Up;
+                    else if (boostPadScript.direction == BoostPad.Direction.Down) boostPadScript.direction = BoostPad.Direction.Up;
                 }
             }
         }

@@ -125,21 +125,17 @@ public class MoveableObject : MonoBehaviour
         if (!draggingObject)
         {
             if (Input.GetMouseButtonDown(0))
-                mouseDownPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            else if (Input.GetMouseButtonUp(0))
+                mouseDownPosition = Input.mousePosition;
+            else if (Input.GetMouseButtonUp(0) && Vector3.Distance(mouseDownPosition, Input.mousePosition) < 0.1)
             {
                 Vector3 worldPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                worldPosition.z = transform.position.z;
+                Vector3 clampedPosition = ClampToTrack(worldPosition);
 
-                if (Vector3.Distance(mouseDownPosition, worldPosition) < 0.1)
+                if (Vector3.Distance(worldPosition, clampedPosition) < 0.3)
                 {
-                    worldPosition.z = transform.position.z;
-                    Vector3 clampedPosition = ClampToTrack(worldPosition);
-
-                    if (Vector3.Distance(worldPosition, clampedPosition) < 0.3)
-                    {
-                        destination = clampedPosition;
-                        movingToDestination = true;
-                    }
+                    destination = clampedPosition;
+                    movingToDestination = true;
                 }
             }
         }
