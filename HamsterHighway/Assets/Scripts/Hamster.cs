@@ -29,6 +29,8 @@ public class Hamster : MonoBehaviour
     private float startX;
     private bool invertedGravity;
 
+    private Vector3 initialHamsterScale;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -38,6 +40,8 @@ public class Hamster : MonoBehaviour
         constantForce.force = new Vector3(3, 0, 0);
 
         startX = transform.position.x;
+
+        initialHamsterScale = transform.Find("Hamster").localScale;
     }
 
     private void FixedUpdate()
@@ -49,10 +53,16 @@ public class Hamster : MonoBehaviour
         Vector3 accelerometer = Input.acceleration;
         minSpeed += accelerometer.x < 0 ? Mathf.Lerp(accelerometerMinSpeed, 0, -accelerometer.x) : Mathf.Lerp(0, accelerometerMaxSpeed, accelerometer.x);
 
-        if (accelerometer.y > 0.6)
+        if (accelerometer.y > 0.5)
+        {
             invertedGravity = true;
-        else if (accelerometer.y < 0.6)
+            transform.Find("Hamster").localScale = new Vector3(initialHamsterScale.x, -initialHamsterScale.y, initialHamsterScale.z);
+        }
+        else if (accelerometer.y < -0.5)
+        {
             invertedGravity = false;
+            transform.Find("Hamster").localScale = initialHamsterScale;
+        }
 
         // Gravity inversion
         if (invertedGravity)

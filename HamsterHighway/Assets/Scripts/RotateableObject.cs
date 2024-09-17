@@ -89,13 +89,10 @@ public class RotatableObject : MonoBehaviour
         if (!draggingObject)
         {
             if (Input.GetMouseButtonDown(0))
-                mouseDownPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            else if (Input.GetMouseButtonUp(0))
+                mouseDownPosition = Input.mousePosition;
+            else if (Input.GetMouseButtonUp(0) && Vector3.Distance(mouseDownPosition, Input.mousePosition) < 0.1)
             {
-                Vector3 worldPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-
-                if (Vector3.Distance(mouseDownPosition, worldPosition) < 0.1)
-                {
+                    Vector3 worldPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
                     worldPosition.z = pivotPoint.z;
                     Vector3 clampedPosition = pivotPoint + (worldPosition - pivotPoint).normalized * transform.localScale.x;
                     Vector3 directionFromPivot = worldPosition - pivotPoint;
@@ -106,7 +103,6 @@ public class RotatableObject : MonoBehaviour
                         HandleRotation(clampedPosition);
                         movingToDestination = true;
                     }
-                }
             }
         }
 
