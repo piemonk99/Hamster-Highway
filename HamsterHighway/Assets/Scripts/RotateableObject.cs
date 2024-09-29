@@ -43,6 +43,8 @@ public class RotatableObject : MonoBehaviour
         platformTrack = new Track(pivotPoint, transform.localScale.x, forwardMaxAngle, backwardMaxAngle, trackEndPrefab, trackObjectPrefab, transform.parent);
 
         movingToDestination = true;
+
+        transform.rotation = Quaternion.Euler(destination);
     }
 
     public void OnMouseDrag()

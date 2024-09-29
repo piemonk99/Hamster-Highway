@@ -135,14 +135,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxNaturalForwardSpeed: 2
   minimumForwardSpeed: 1
+  extraSpeedPerScore: 0.005
   loseBelowY: 0
+  loseAboveY: 10
   loseSpeedFactor: 0.05
   accelerometerMinSpeed: -0.5
   accelerometerMaxSpeed: 1.5
+  yawForce: 1
   debugText: {fileID: 0}
   scoreText: {fileID: 0}
   coinsText: {fileID: 0}
   coinSound: {fileID: 8300000, guid: 69265be8f703e81469329deaceafb7ae, type: 3}
+  skyboxes: []
+  skyboxChangeInterval: 100
 --- !u!135 &6621925518670936274
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -243,7 +248,7 @@ Transform:
   m_Children:
   - {fileID: 3536676792368328454}
   m_Father: {fileID: 2450780938824245631}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 34.11474, y: 24.425287, z: -0.13995999}
 --- !u!1 &1769598062028969209
 GameObject:
   m_ObjectHideFlags: 0
@@ -308,7 +313,7 @@ Transform:
   - {fileID: 3893163494661704815}
   - {fileID: 899757790381412432}
   m_Father: {fileID: 8643406714043398082}
-  m_LocalEulerAnglesHint: {x: 7.6933346, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 85.00001, y: 180, z: 180}
 --- !u!1 &2508178541073082647
 GameObject:
   m_ObjectHideFlags: 0
@@ -377,7 +382,7 @@ Transform:
   - {fileID: 6527226060127077305}
   - {fileID: 2196830578922564596}
   m_Father: {fileID: 8643406714043398082}
-  m_LocalEulerAnglesHint: {x: 18.291626, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 30.470005, y: 0, z: 0}
 --- !u!1 &2990995212373044858
 GameObject:
   m_ObjectHideFlags: 0
@@ -1054,7 +1059,7 @@ Transform:
   m_Children:
   - {fileID: 5521644480125831453}
   m_Father: {fileID: 2450780938824245631}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 34.114723, y: -24.425285, z: 0.13991147}
 --- !u!1 &6635399847293433817
 GameObject:
   m_ObjectHideFlags: 0
@@ -1089,7 +1094,7 @@ Transform:
   - {fileID: 5380039670055049932}
   - {fileID: 2450780938824245631}
   m_Father: {fileID: 537883213749649992}
-  m_LocalEulerAnglesHint: {x: -27.010147, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -40.469997, y: 0, z: 0}
 --- !u!1 &6696102074981233469
 GameObject:
   m_ObjectHideFlags: 0
@@ -1153,7 +1158,7 @@ Transform:
   m_Children:
   - {fileID: 8643406714043398082}
   m_Father: {fileID: 6657313402307886869}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 35.927204, y: 0, z: 0}
 --- !u!1 &7519233308905321514
 GameObject:
   m_ObjectHideFlags: 0
@@ -1273,7 +1278,7 @@ Transform:
   - {fileID: 3064618258964709923}
   - {fileID: 1500161430667618473}
   m_Father: {fileID: 8643406714043398082}
-  m_LocalEulerAnglesHint: {x: 25.439999, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 65.44001, y: 0, z: 0}
 --- !u!1 &7586498195923244879
 GameObject:
   m_ObjectHideFlags: 0
