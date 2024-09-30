@@ -117,19 +117,12 @@ public class Hamster : MonoBehaviour
         // Check if the accelerometer Y value has changed from positive to negative or vice versa
         if ((previousAccelerometerY < 0 && accelerometerY >= 0) || (previousAccelerometerY >= 0 && accelerometerY < 0))
         {
-            
             if (gravityInversionCredits > 0)
             {
                 // Flip gravity, adjust hamster's scale to reflect gravity inversion, and decrement the credits when gravity is inverted
                 invertedGravity = accelerometerY >= 0;
                 transform.Find("Hamster").localScale = invertedGravity ? new Vector3(initialHamsterScale.x, -initialHamsterScale.y, initialHamsterScale.z) : initialHamsterScale;
                 gravityInversionCredits--;
-
-                Debug.Log("incremented, now " + gravityInversionCredits);
-            }
-            else
-            {
-                Debug.Log("they are zero, cant do it");
             }
         }
 
@@ -153,8 +146,6 @@ public class Hamster : MonoBehaviour
         {
             gravityInversionCredits++;
             gravityCooldownTimer = 0f;
-
-            Debug.Log("incremented");
         }
     }
 
@@ -208,13 +199,12 @@ public class Hamster : MonoBehaviour
         }
     }
 
-    //Called by the trip and roll animation, allows us to stop correcting the hamster's rotation at the right time
+    // Called by the trip and roll animation, allows us to stop correcting the hamster's rotation at the right time
     public void StartRolling()
     {
         // When starting to roll, we capture the parent's current rotation as the baseline
         previousRotation = transform.rotation;
 
-        Debug.Log("Started rolling");
         rolling = true;
         tripping = false;
 
