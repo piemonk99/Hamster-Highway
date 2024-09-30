@@ -20,6 +20,7 @@ public class Hamster : MonoBehaviour
     [SerializeField] private float accelerometerMinSpeed = -0.5f;
     [SerializeField] private float accelerometerMaxSpeed = 1.5f;
     [SerializeField] private float yawForce = 1;
+    private bool phoneTiltEnabled; //Would like to implement enabling/disabling of the phone tilt mechanic, personally I find it makes gravity swapping harder/less intuitive
 
     [SerializeField] private TextMeshProUGUI debugText;
     [SerializeField] private TextMeshProUGUI scoreText;
@@ -39,6 +40,12 @@ public class Hamster : MonoBehaviour
     private bool invertedGravity;
     private bool tripping;
     private bool rolling;
+
+    private float gravityCooldownTimer = 0f;
+    private float gravityCooldownDuration = 1.5f;
+    private int gravityInversionCredits = 5;
+    private int maxGravityInversionCredits = 5;
+    private float previousAccelerometerY;
 
     private float previousYVelocity = 0;
     private Vector3 initialHamsterScale;
@@ -66,47 +73,14 @@ public class Hamster : MonoBehaviour
         float progress = transform.position.x - startX;
         float minSpeed = minimumForwardSpeed + progress * extraSpeedPerScore;
 
+
         debugText.text = $"{Input.acceleration}";
         Vector3 accelerometer = Input.acceleration;
         minSpeed += accelerometer.x < 0 ? Mathf.Lerp(accelerometerMinSpeed, 0, -accelerometer.x) : Mathf.Lerp(0, accelerometerMaxSpeed, accelerometer.x);
 
-        if (accelerometer.y > 0.5)
-        {
-            invertedGravity = true;
-            transform.Find("Hamster").localScale = new Vector3(initialHamsterScale.x, -initialHamsterScale.y, initialHamsterScale.z);
-        }
-        else if (accelerometer.y < -0.5)
-        {
-            invertedGravity = false;
-            transform.Find("Hamster").localScale = initialHamsterScale;
-        }
+        HandleGravity(accelerometer.y);
 
-        // Gravity inversion
-        if (invertedGravity)
-        {
-            rb.useGravity = false;
-            rb.velocity -= Physics.gravity * Time.fixedDeltaTime;
-        }
-        else
-            rb.useGravity = true;
-
-        // Speed and movement control
-        Vector3 velocity = rb.velocity;
-        if (velocity.x < minSpeed)
-        {
-            velocity.x = minSpeed;
-            rb.velocity = velocity;
-        }
-        else if (velocity.x > minSpeed && velocity.x < maxNaturalForwardSpeed)
-        {
-            GetComponent<ConstantForce>().force = new Vector3(3, 0, 0);
-        }
-        else if (velocity.x > maxNaturalForwardSpeed + progress * extraSpeedPerScore)
-        {
-            GetComponent<ConstantForce>().force = new Vector3(0, 0, 0);
-        }
-
-        rb.AddForce(new Vector3(Input.gyro.rotationRate.y * yawForce, 0, 0));
+        HandleSpeed(minSpeed, progress);
 
         if (transform.position.y < loseBelowY || transform.position.y > loseAboveY)
         {
@@ -138,6 +112,72 @@ public class Hamster : MonoBehaviour
         }
     }
 
+    private void HandleGravity(float accelerometerY)
+    {
+        // Check if the accelerometer Y value has changed from positive to negative or vice versa
+        if ((previousAccelerometerY < 0 && accelerometerY >= 0) || (previousAccelerometerY >= 0 && accelerometerY < 0))
+        {
+            
+            if (gravityInversionCredits > 0)
+            {
+                // Flip gravity, adjust hamster's scale to reflect gravity inversion, and decrement the credits when gravity is inverted
+                invertedGravity = accelerometerY >= 0;
+                transform.Find("Hamster").localScale = invertedGravity ? new Vector3(initialHamsterScale.x, -initialHamsterScale.y, initialHamsterScale.z) : initialHamsterScale;
+                gravityInversionCredits--;
+
+                Debug.Log("incremented, now " + gravityInversionCredits);
+            }
+            else
+            {
+                Debug.Log("they are zero, cant do it");
+            }
+        }
+
+        // Update previous accelerometer Y value for the next frame
+        previousAccelerometerY = accelerometerY;
+
+        // Gravity inversion mechanics
+        if (invertedGravity)
+        {
+            rb.useGravity = false;
+            rb.velocity -= Physics.gravity * Time.fixedDeltaTime;
+        }
+        else
+        {
+            rb.useGravity = true;
+        }
+
+        // Timer to replenish gravity inversion credits
+        gravityCooldownTimer += Time.fixedDeltaTime;
+        if (gravityCooldownTimer >= gravityCooldownDuration && gravityInversionCredits < maxGravityInversionCredits)
+        {
+            gravityInversionCredits++;
+            gravityCooldownTimer = 0f;
+
+            Debug.Log("incremented");
+        }
+    }
+
+    private void HandleSpeed(float minSpeed, float progress)
+    {
+        Vector3 velocity = rb.velocity;
+        if (velocity.x < minSpeed)
+        {
+            velocity.x = minSpeed;
+            rb.velocity = velocity;
+        }
+        else if (velocity.x > minSpeed && velocity.x < maxNaturalForwardSpeed)
+        {
+            GetComponent<ConstantForce>().force = new Vector3(3, 0, 0);
+        }
+        else if (velocity.x > maxNaturalForwardSpeed + progress * extraSpeedPerScore)
+        {
+            GetComponent<ConstantForce>().force = new Vector3(0, 0, 0);
+        }
+
+        rb.AddForce(new Vector3(Input.gyro.rotationRate.y * yawForce, 0, 0));
+    }
+
     private void LateUpdate()
     {
         HandleRolling();
@@ -162,14 +202,8 @@ public class Hamster : MonoBehaviour
             CorrectHamsterRotation(); // Re-enable upright correction
         }
 
-        if (rolling)
+        if (!rolling)
         {
-            // Smoothly inherit the changes in the parent's rotation
-            RotateWithParent();
-        }
-        else
-        {
-            // Correct the hamster's upright rotation
             CorrectHamsterRotation();
         }
     }
@@ -187,26 +221,6 @@ public class Hamster : MonoBehaviour
         animator.SetBool("Rolling", true);
     }
 
-    private void RotateWithParent()
-    {
-        /*// Get the parent's current rotation
-        Quaternion currentParentRotation = transform.rotation;
-
-        // Calculate the difference in rotation from the last frame (how much the parent has rotated)
-        Quaternion rotationDifference = Quaternion.Inverse(previousRotation) * currentParentRotation;
-
-        // Update previous parent rotation for the next frame
-        previousRotation = currentParentRotation;
-
-        // Apply the rotation difference to the hamster's body, but maintain the initial offset
-        Transform hamsterBody = transform.GetChild(0);
-        //hamsterBody.localRotation = Quaternion.Euler(0, -90, 0) * rotationDifference; // Maintain the forward facing
-
-        // Optional: Log the local rotation to help debug
-        Debug.Log($"Hamster Body Local Rotation: {hamsterBody.localRotation.eulerAngles}");*/
-    }
-
-
     private void CorrectHamsterRotation()
     {
         transform.GetChild(0).rotation = Quaternion.Euler(0, -90, 0);
@@ -223,9 +237,6 @@ public class Hamster : MonoBehaviour
 
         // Tolerance to account for slight differences
         float tolerance = 10f;
-
-        Debug.Log($"Is hamster aligned with parent? {rotationDifference < tolerance}. parentZRotation = {parentZRotation}, childXRotation = {childXRotation} \n" +
-                  $"We are checking if {parentZRotation + 180} minus {childXRotation}, which is {rotationDifference}, is less than {tolerance}.");
 
         // Return true if the parent's Y rotation is close to the inverse of the child's Y rotation
         return rotationDifference < tolerance;

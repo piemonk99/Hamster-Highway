@@ -129,16 +129,13 @@ public class GameManager : MonoBehaviour
                     rotatableScript.forwardMaxAngle = rotatableScript.backwardMaxAngle;
                     rotatableScript.backwardMaxAngle = tempAngle;
 
-                    // Invert the starting angle
                     rotatableScript.startingAngle *= -1;
-                    // rotatableScript.currentAngle *= -1;
-
                 }
             }
             else if (interactable.name == "Booster Pad" || interactable.name == "Strong Booster Pad")
             {
-                BoostPad boostPadScript = interactable.Find("BoostPad")?.GetComponent<BoostPad>();
-                if (boostPadScript != null )
+                BoostPad boostPadScript = interactable.GetComponent<BoostPad>();
+                if (boostPadScript != null)
                 {
                     if (boostPadScript.direction == BoostPad.Direction.Up) boostPadScript.direction = BoostPad.Direction.Down;
                     else if (boostPadScript.direction == BoostPad.Direction.Down) boostPadScript.direction = BoostPad.Direction.Up;
