@@ -9,6 +9,10 @@ public class Options
 
     [SerializeField] public float Volume = 1;
 
+    // New toggles
+    [SerializeField] public bool useAccelerometer = true;
+    [SerializeField] public bool invertGravityWithButton = false;
+
     public static void Read()
     {
         if (File.Exists(Path()))

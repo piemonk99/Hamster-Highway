@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private Transform ball;
+    [SerializeField] private UIManager uiManager;
 
     [SerializeField] private GameObject startSubLevelPrefab;
     [SerializeField] private GameObject[] subLevelPrefabs;
@@ -21,6 +22,9 @@ public class GameManager : MonoBehaviour
     private int subLevelBallIsIn;
     private int currentLevelCenter;
 
+    private bool flippingEnabled;
+    private bool tiltingEnabled;
+
     private void Awake()
     {
         subLevelBallIsIn = 0;
@@ -34,9 +38,10 @@ public class GameManager : MonoBehaviour
                 subLevelQueue.Enqueue(SpawnNewSubLevel(i));
             }
 
-        // For starting in Unity editor
+        // Read options and initialize the game state
         Options.Read();
         ScoreTracker.Read();
+        RefreshOptions();
     }
 
     private void Update()
@@ -165,4 +170,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+    // Refresh game options based on saved settings
+    public void RefreshOptions()
+    {
+        // Read the settings from Options class
+        flippingEnabled = Options.Instance.invertGravityWithButton;
+        tiltingEnabled = Options.Instance.useAccelerometer;
+
+        // Call UIManager to update the gravity inversion button based on flippingEnabled
+        uiManager.SetInvertGravityButtonActivity(!flippingEnabled);
+
+        ball.GetComponent<Hamster>().flippingEnabled = flippingEnabled;
+        ball.GetComponent<Hamster>().tiltingEnabled = tiltingEnabled;
+    }
 }

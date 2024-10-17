@@ -20,11 +20,11 @@ public class Hamster : MonoBehaviour
     [SerializeField] private float accelerometerMinSpeed = -0.5f;
     [SerializeField] private float accelerometerMaxSpeed = 1.5f;
     [SerializeField] private float yawForce = 1;
-    private bool phoneTiltEnabled; //Would like to implement enabling/disabling of the phone tilt mechanic, personally I find it makes gravity swapping harder/less intuitive
 
     [SerializeField] private TextMeshProUGUI debugText;
     [SerializeField] private TextMeshProUGUI scoreText;
-    [SerializeField] private TextMeshProUGUI coinsText; 
+    [SerializeField] private TextMeshProUGUI coinsText;
+    [SerializeField] private TextMeshProUGUI inversionsText;
 
     [SerializeField] private AudioClip coinSound;
     [SerializeField] private Material[] skyboxes;
@@ -38,6 +38,10 @@ public class Hamster : MonoBehaviour
 
     private float startX;
     private bool invertedGravity;
+
+    public bool flippingEnabled;
+    public bool tiltingEnabled;
+
     private bool tripping;
     private bool rolling;
 
@@ -73,14 +77,14 @@ public class Hamster : MonoBehaviour
         float progress = transform.position.x - startX;
         float minSpeed = minimumForwardSpeed + progress * extraSpeedPerScore;
 
-
         debugText.text = $"{Input.acceleration}";
         Vector3 accelerometer = Input.acceleration;
-        minSpeed += accelerometer.x < 0 ? Mathf.Lerp(accelerometerMinSpeed, 0, -accelerometer.x) : Mathf.Lerp(0, accelerometerMaxSpeed, accelerometer.x);
+
+        
 
         HandleGravity(accelerometer.y);
 
-        HandleSpeed(minSpeed, progress);
+        HandleSpeed(minSpeed, progress, accelerometer.x);
 
         if (transform.position.y < loseBelowY || transform.position.y > loseAboveY)
         {
@@ -114,20 +118,25 @@ public class Hamster : MonoBehaviour
 
     private void HandleGravity(float accelerometerY)
     {
-        // Check if the accelerometer Y value has changed from positive to negative or vice versa
-        if ((previousAccelerometerY < 0 && accelerometerY >= 0) || (previousAccelerometerY >= 0 && accelerometerY < 0))
+        if (flippingEnabled)
         {
-            if (gravityInversionCredits > 0)
+            // Check if the accelerometer Y value has changed from positive to negative or vice versa
+            if ((previousAccelerometerY < 0 && accelerometerY >= 0) || (previousAccelerometerY >= 0 && accelerometerY < 0))
             {
-                // Flip gravity, adjust hamster's scale to reflect gravity inversion, and decrement the credits when gravity is inverted
-                invertedGravity = accelerometerY >= 0;
-                transform.Find("Hamster").localScale = invertedGravity ? new Vector3(initialHamsterScale.x, -initialHamsterScale.y, initialHamsterScale.z) : initialHamsterScale;
-                gravityInversionCredits--;
+                if (gravityInversionCredits > 0)
+                {
+                    // Flip gravity, adjust hamster's scale to reflect gravity inversion, and decrement the credits when gravity is inverted
+                    invertedGravity = accelerometerY >= 0;
+                    transform.Find("Hamster").localScale = invertedGravity ? new Vector3(initialHamsterScale.x, -initialHamsterScale.y, initialHamsterScale.z) : initialHamsterScale;
+                    gravityInversionCredits--;
+                    inversionsText.text = $"Inversions: {gravityInversionCredits}/{maxGravityInversionCredits}";
+                }
             }
-        }
 
-        // Update previous accelerometer Y value for the next frame
-        previousAccelerometerY = accelerometerY;
+            // Update previous accelerometer Y value for the next frame
+            previousAccelerometerY = accelerometerY;
+        }
+        
 
         // Gravity inversion mechanics
         if (invertedGravity)
@@ -146,11 +155,30 @@ public class Hamster : MonoBehaviour
         {
             gravityInversionCredits++;
             gravityCooldownTimer = 0f;
+            inversionsText.text = $"Inversions: {gravityInversionCredits}/{maxGravityInversionCredits}";
         }
     }
 
-    private void HandleSpeed(float minSpeed, float progress)
+    public void FlipGravityButtonPressed()
     {
+        if (gravityInversionCredits > 0)
+        {
+            // Flip gravity, adjust hamster's scale to reflect gravity inversion, and decrement the credits when gravity is inverted
+            invertedGravity = !invertedGravity;
+            transform.Find("Hamster").localScale = invertedGravity ? new Vector3(initialHamsterScale.x, -initialHamsterScale.y, initialHamsterScale.z) : initialHamsterScale;
+            gravityInversionCredits--;
+            inversionsText.text = $"Inversions: {gravityInversionCredits}/{maxGravityInversionCredits}";
+        }
+    }
+
+    private void HandleSpeed(float minSpeed, float progress, float accelerometerX)
+    {
+        if (tiltingEnabled)
+        {
+            rb.AddForce(new Vector3(Input.gyro.rotationRate.y * yawForce, 0, 0));
+            minSpeed += accelerometerX < 0 ? Mathf.Lerp(accelerometerMinSpeed, 0, -accelerometerX) : Mathf.Lerp(0, accelerometerMaxSpeed, accelerometerX);
+        }
+
         Vector3 velocity = rb.velocity;
         if (velocity.x < minSpeed)
         {
@@ -166,7 +194,7 @@ public class Hamster : MonoBehaviour
             GetComponent<ConstantForce>().force = new Vector3(0, 0, 0);
         }
 
-        rb.AddForce(new Vector3(Input.gyro.rotationRate.y * yawForce, 0, 0));
+        
     }
 
     private void LateUpdate()
