@@ -193,8 +193,6 @@ public class Hamster : MonoBehaviour
         {
             GetComponent<ConstantForce>().force = new Vector3(0, 0, 0);
         }
-
-        
     }
 
     private void LateUpdate()
