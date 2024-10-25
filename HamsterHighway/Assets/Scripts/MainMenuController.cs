@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenuController : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI bestScoreText;
+
+    [SerializeField] private Toggle ARToggle;
 
     void Start()
     {
@@ -17,7 +20,15 @@ public class MainMenuController : MonoBehaviour
 
     public void StartButtonClicked()
     {
-        SceneManager.LoadScene("InfiniteRunner");
+        if (ARToggle.isOn)
+        {
+            SceneManager.LoadScene("ARInfiniteRunner");
+        }
+        else
+        {
+            SceneManager.LoadScene("InfiniteRunner");
+        }
+        
     }
 
     public void OptionsButtonClicked()

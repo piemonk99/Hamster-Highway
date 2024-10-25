@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform ball;
     [SerializeField] private UIManager uiManager;
 
+    [SerializeField] private Transform levelParent;
     [SerializeField] private GameObject startSubLevelPrefab;
     [SerializeField] private GameObject[] subLevelPrefabs;
     [SerializeField] private GameObject[] gravityInversionSubLevelPrefabs;
@@ -71,7 +72,7 @@ public class GameManager : MonoBehaviour
         if (subLevelNumber % subLevelsPerGravityInversions == 0)
         {
             int randomLevelIndex = Random.Range(0, gravityInversionSubLevelPrefabs.Length);
-            newSubLevel = Instantiate(gravityInversionSubLevelPrefabs[randomLevelIndex]);
+            newSubLevel = Instantiate(gravityInversionSubLevelPrefabs[randomLevelIndex], levelParent);
             newSubLevel.transform.position = new Vector3(xPosition, 0, 0);
 
             if (gravityInverted)
@@ -87,7 +88,7 @@ public class GameManager : MonoBehaviour
         else
         {
             int randomLevelIndex = Random.Range(0, subLevelPrefabs.Length);
-            newSubLevel = Instantiate(subLevelPrefabs[randomLevelIndex]);
+            newSubLevel = Instantiate(subLevelPrefabs[randomLevelIndex], levelParent);
             newSubLevel.transform.position = new Vector3(xPosition, 0, 0);
 
             if (gravityInverted)

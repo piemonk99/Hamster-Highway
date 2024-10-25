@@ -70,6 +70,8 @@ public class Hamster : MonoBehaviour
         Input.gyro.enabled = true;
 
         previousRotation = transform.rotation;
+
+        coinsText.text = $"Coins: {ScoreTracker.Instance.coins}";
     }
 
     private void FixedUpdate()
