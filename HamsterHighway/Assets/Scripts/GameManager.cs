@@ -76,12 +76,12 @@ public class GameManager : MonoBehaviour
         {
             int randomLevelIndex = Random.Range(0, gravityInversionSubLevelPrefabs.Length);
             newSubLevel = Instantiate(gravityInversionSubLevelPrefabs[randomLevelIndex], levelParent);
-            newSubLevel.transform.position = new Vector3(xPosition, 0, 0);
+            newSubLevel.transform.localPosition = new Vector3(xPosition, 0, 0);
 
             if (gravityInverted)
             {
                 newSubLevel.transform.localScale = new Vector3(1, -1, 1);
-                newSubLevel.transform.position = new Vector3(xPosition, 9, 0);
+                newSubLevel.transform.localPosition = new Vector3(xPosition, 9, 0);
                 FlipBoxCollidersInSubLevel(newSubLevel.transform);
                 InvertMoveables(newSubLevel.transform);
             }
@@ -92,12 +92,12 @@ public class GameManager : MonoBehaviour
         {
             int randomLevelIndex = Random.Range(0, subLevelPrefabs.Length);
             newSubLevel = Instantiate(subLevelPrefabs[randomLevelIndex], levelParent);
-            newSubLevel.transform.position = new Vector3(xPosition, 0, 0);
+            newSubLevel.transform.localPosition = new Vector3(xPosition, 0, 0);
 
             if (gravityInverted)
             {
                 newSubLevel.transform.localScale = new Vector3(1, -1, 1);
-                newSubLevel.transform.position = new Vector3(xPosition, 9, 0);
+                newSubLevel.transform.localPosition = new Vector3(xPosition, 9, 0);
                 FlipBoxCollidersInSubLevel(newSubLevel.transform);
                 InvertMoveables(newSubLevel.transform);
             }
