@@ -282,13 +282,13 @@ public class Hamster : MonoBehaviour
 
     private void GameOver()
     {
-        ScoreTracker.Instance.prevBestScore = ScoreTracker.Instance.bestScore;
+        /*ScoreTracker.Instance.prevBestScore = ScoreTracker.Instance.bestScore;
 
         if (ScoreTracker.Instance.score > ScoreTracker.Instance.bestScore)
             ScoreTracker.Instance.bestScore = ScoreTracker.Instance.score;
 
         ScoreTracker.Instance.Write();
-        SceneManager.LoadScene("GameOver");
+        SceneManager.LoadScene("GameOver");*/
     }
 
     private void PlayCorrectAnimation()
