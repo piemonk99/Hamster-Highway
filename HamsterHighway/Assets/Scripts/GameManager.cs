@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     private bool flippingEnabled;
     private bool tiltingEnabled;
 
-    private void OnEnable()
+    private void Awake()
     {
         subLevelBallIsIn = 0;
         currentLevelCenter = (int)(subLevelsToLoadAtOnce / 2f);
