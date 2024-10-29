@@ -65,7 +65,7 @@ public class Hamster : MonoBehaviour
         ConstantForce constantForce = gameObject.AddComponent<ConstantForce>();
         constantForce.force = new Vector3(3, 0, 0);
 
-        startX = transform.position.x;
+        startX = transform.localPosition.x;
         initialHamsterScale = transform.Find("Hamster").localScale;
         Input.gyro.enabled = true;
 
@@ -76,7 +76,7 @@ public class Hamster : MonoBehaviour
 
     private void FixedUpdate()
     {
-        float progress = transform.position.x - startX;
+        float progress = transform.localPosition.x - startX;
         float minSpeed = minimumForwardSpeed + progress * extraSpeedPerScore;
 
         debugText.text = $"{Input.acceleration}";
@@ -88,17 +88,17 @@ public class Hamster : MonoBehaviour
 
         HandleSpeed(minSpeed, progress, accelerometer.x);
 
-        if (transform.position.y < loseBelowY || transform.position.y > loseAboveY)
+        if (transform.localPosition.y < loseBelowY || transform.localPosition.y > loseAboveY)
         {
             GameOver();
         }
 
-        if ((transform.position - previousPosition).magnitude / Time.fixedDeltaTime < loseSpeedFactor * minimumForwardSpeed)
+        if ((transform.localPosition - previousPosition).magnitude / Time.fixedDeltaTime < loseSpeedFactor * minimumForwardSpeed)
         {
             GameOver();
         }
 
-        previousPosition = transform.position;
+        previousPosition = transform.localPosition;
         ScoreTracker.Instance.score = Mathf.RoundToInt(progress);
         scoreText.text = $"Score: {ScoreTracker.Instance.score}";
 
@@ -250,7 +250,7 @@ public class Hamster : MonoBehaviour
         float parentZRotation = transform.eulerAngles.z;
         float childXRotation = transform.GetChild(0).localRotation.eulerAngles.x;
 
-        // We want the parent’s rotation to be close to the inverse of the child's locked rotation
+        // We want the parentï¿½s rotation to be close to the inverse of the child's locked rotation
         float rotationDifference = Mathf.Abs(((parentZRotation + 180) % 360) - childXRotation);
 
         // Tolerance to account for slight differences
