@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3080011748827571354}
   - component: {fileID: 6363316604485077108}
   - component: {fileID: 1367005020547196003}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,7 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 487446663438792406}
   - component: {fileID: 2208869029732319782}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: KillCube
   m_TagString: Hazard
   m_Icon: {fileID: 0}

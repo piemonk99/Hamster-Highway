@@ -1,10 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
-using UnityEngine.XR.ARFoundation;
 
 public class GameManager : MonoBehaviour
 {
@@ -29,6 +24,14 @@ public class GameManager : MonoBehaviour
     private bool flippingEnabled;
     private bool tiltingEnabled;
 
+    private float difficultyBudget = 1.0f;  // Persistent difficulty budget
+    private int generatedSublevelCount = 0; // Tracks the total number of sublevels generated
+
+
+    // Lists for core sublevels
+    private List<GameObject> coreSubLevels;
+    private List<GameObject> coreGravityInversionSubLevels;
+
     private void Awake()
     {
         subLevelBallIsIn = 0;
@@ -36,11 +39,30 @@ public class GameManager : MonoBehaviour
 
         subLevelQueue = new Queue<GameObject>();
 
+        // Initialize core sublevels lists
+        coreSubLevels = new List<GameObject>();
+        coreGravityInversionSubLevels = new List<GameObject>();
+
+        // Populate core levels based on isCoreLevel flag
+        foreach (var subLevel in subLevelPrefabs)
+        {
+            if (subLevel.GetComponent<SublevelDifficulty>()?.isCoreLevel == true)
+                coreSubLevels.Add(subLevel);
+        }
+
+        foreach (var subLevel in gravityInversionSubLevelPrefabs)
+        {
+            if (subLevel.GetComponent<SublevelDifficulty>()?.isCoreLevel == true)
+                coreGravityInversionSubLevels.Add(subLevel);
+        }
+
         if (doGeneration)
+        {
             for (int i = 1; i < subLevelsToLoadAtOnce; i++)
             {
                 subLevelQueue.Enqueue(SpawnNewSubLevel(i));
             }
+        }
 
         // Read options and initialize the game state
         Options.Read();
@@ -53,7 +75,7 @@ public class GameManager : MonoBehaviour
         if (!doGeneration)
             return;
 
-        //Check ball's progress and spawn more of the level every time it goes the length of a level
+        // Check ball's progress and spawn more of the level every time it goes the length of a level
         subLevelBallIsIn = (int)(ball.position.x / 16f);
 
         while (subLevelBallIsIn >= currentLevelCenter)
@@ -68,43 +90,131 @@ public class GameManager : MonoBehaviour
     private GameObject SpawnNewSubLevel(int subLevelNumber)
     {
         int xPosition = subLevelNumber * 16;
-
         GameObject newSubLevel;
 
-        //Swap gravity using a gravity inversion sublevel every certain number of levels
+        Debug.Log($"Budget before choosing sublevel: {difficultyBudget}");
+
+        // Swap gravity using a gravity inversion sublevel every certain number of levels
         if (subLevelNumber % subLevelsPerGravityInversions == 0)
         {
-            int randomLevelIndex = Random.Range(0, gravityInversionSubLevelPrefabs.Length);
-            newSubLevel = Instantiate(gravityInversionSubLevelPrefabs[randomLevelIndex], levelParent);
-            newSubLevel.transform.localPosition = new Vector3(xPosition, 0, 0);
-
-            if (gravityInverted)
-            {
-                newSubLevel.transform.localScale = new Vector3(1, -1, 1);
-                newSubLevel.transform.localPosition = new Vector3(xPosition, 9, 0);
-                FlipBoxCollidersInSubLevel(newSubLevel.transform);
-                InvertMoveables(newSubLevel.transform);
-            }
-
+            Debug.Log("Spawning gravity inversion sublevel...");
+            newSubLevel = PickAndInstantiateSublevel(coreGravityInversionSubLevels, true);
+            PositionAndInvertSubLevel(newSubLevel, xPosition);
             gravityInverted = !gravityInverted;
         }
         else
         {
-            int randomLevelIndex = Random.Range(0, subLevelPrefabs.Length);
-            newSubLevel = Instantiate(subLevelPrefabs[randomLevelIndex], levelParent);
-            newSubLevel.transform.localPosition = new Vector3(xPosition, 0, 0);
+            // Pick a sublevel based on the current budget from core levels
+            newSubLevel = PickAndInstantiateSublevel(coreSubLevels, false);
+            PositionAndInvertSubLevel(newSubLevel, xPosition);
+        }
 
-            if (gravityInverted)
+        // Update generatedSublevelCount and calculate the budget increment based on it
+        generatedSublevelCount++;
+        float budgetIncrease = 1.0f + (generatedSublevelCount * 16 / 100.0f); // Using generated count for difficulty growth
+        difficultyBudget += budgetIncrease;
+
+        // Clamp difficultyBudget between -7 and 12
+        difficultyBudget = Mathf.Clamp(difficultyBudget, -7.0f, 12.0f);
+
+        Debug.Log($"Difficulty budget gained back after spawning: {budgetIncrease}");
+        Debug.Log($"Final budget after spawning: {difficultyBudget}");
+
+        return newSubLevel;
+    }
+
+
+    private GameObject PickAndInstantiateSublevel(List<GameObject> coreLevels, bool isGravityInversion)
+    {
+        // Randomly pick a core level
+        GameObject chosenCoreLevel = coreLevels[Random.Range(0, coreLevels.Count)];
+        Debug.Log($"Core level chosen: {chosenCoreLevel.name}");
+
+        // Retrieve all versions of this core level by finding subsequent entries in subLevelPrefabs
+        List<GameObject> levelVariants = GetAllLevelVariants(chosenCoreLevel, isGravityInversion);
+
+        // Find the highest difficulty version that we can afford within the budget
+        GameObject chosenLevel = null;
+        foreach (var variant in levelVariants)
+        {
+            int difficultyValue = variant.GetComponent<SublevelDifficulty>().difficultyValue;
+            if (difficultyValue <= difficultyBudget)
             {
-                newSubLevel.transform.localScale = new Vector3(1, -1, 1);
-                newSubLevel.transform.localPosition = new Vector3(xPosition, 9, 0);
-                FlipBoxCollidersInSubLevel(newSubLevel.transform);
-                InvertMoveables(newSubLevel.transform);
+                Debug.Log($"Variant {variant.name} with difficulty {difficultyValue} - Can afford");
+                chosenLevel = variant;
+            }
+            else
+            {
+                Debug.Log($"Variant {variant.name} with difficulty {difficultyValue} - Cannot afford");
+                break; // Stop if we can’t afford the next harder version
             }
         }
 
+        // If no affordable level variant was found, default to the easiest variant
+        chosenLevel = chosenLevel ?? levelVariants[0];
+        Debug.Log($"Chosen variant: {chosenLevel.name} with difficulty {chosenLevel.GetComponent<SublevelDifficulty>().difficultyValue}");
 
-        return newSubLevel;
+        // Adjust the budget by subtracting the difficulty value
+        float chosenDifficultyValue = chosenLevel.GetComponent<SublevelDifficulty>().difficultyValue;
+        difficultyBudget -= chosenDifficultyValue;
+        Debug.Log($"Budget deducted for chosen variant: {chosenDifficultyValue}");
+
+        // Instantiate the chosen level
+        return Instantiate(chosenLevel, levelParent);
+    }
+
+
+
+    private List<GameObject> GetAllLevelVariants(GameObject coreLevel, bool isGravityInversion)
+    {
+        GameObject[] levelArray = isGravityInversion ? gravityInversionSubLevelPrefabs : subLevelPrefabs;
+        List<GameObject> levelVariants = new List<GameObject>();
+
+        // Extract the base name by finding the numeric part of the level name (e.g., "SubLevel5" from "SubLevel5Easy")
+        string baseName = GetBaseLevelName(coreLevel.name);
+
+        // Collect variants that start with the same base name
+        foreach (var level in levelArray)
+        {
+            if (level.name.StartsWith(baseName))
+            {
+                levelVariants.Add(level);
+            }
+        }
+        return levelVariants;
+    }
+
+    // Helper function to extract the base name of the level (e.g., "SubLevel5" from "SubLevel5Easy")
+    private string GetBaseLevelName(string levelName)
+    {
+        for (int i = 0; i < levelName.Length; i++)
+        {
+            if (char.IsDigit(levelName[i]))
+            {
+                // Find the end of the numeric part
+                int endOfNumber = i;
+                while (endOfNumber < levelName.Length && char.IsDigit(levelName[endOfNumber]))
+                {
+                    endOfNumber++;
+                }
+                return levelName.Substring(0, endOfNumber); // Extract "SubLevelX"
+            }
+        }
+        return levelName; // Fallback, although every level name should contain a number
+    }
+
+
+    private void PositionAndInvertSubLevel(GameObject subLevel, int xPosition)
+    {
+        subLevel.transform.localPosition = new Vector3(xPosition, 0, 0);
+
+        if (gravityInverted)
+        {
+            subLevel.transform.localScale = new Vector3(1, -1, 1);
+            subLevel.transform.localPosition = new Vector3(xPosition, 9, 0);
+            FlipBoxCollidersInSubLevel(subLevel.transform);
+            InvertMoveables(subLevel.transform);
+        }
     }
 
     private void InvertMoveables(Transform subLevel)
@@ -173,7 +283,6 @@ public class GameManager : MonoBehaviour
             collider.center = newCenter;
         }
     }
-
 
     // Refresh game options based on saved settings
     public void RefreshOptions()

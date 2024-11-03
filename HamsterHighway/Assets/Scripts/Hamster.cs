@@ -77,7 +77,7 @@ public class Hamster : MonoBehaviour
     private void FixedUpdate()
     {
         float progress = transform.localPosition.x - startX;
-        float minSpeed = minimumForwardSpeed + progress * extraSpeedPerScore;
+        float minSpeed = minimumForwardSpeed/* + progress * extraSpeedPerScore*/;
 
         debugText.text = $"{Input.acceleration}";
         Vector3 accelerometer = Input.acceleration;
@@ -99,8 +99,10 @@ public class Hamster : MonoBehaviour
         }
 
         previousPosition = transform.localPosition;
+
         ScoreTracker.Instance.score = Mathf.RoundToInt(progress);
         scoreText.text = $"Score: {ScoreTracker.Instance.score}";
+
 
         PlayCorrectAnimation();
 
@@ -191,7 +193,7 @@ public class Hamster : MonoBehaviour
         {
             GetComponent<ConstantForce>().force = new Vector3(3, 0, 0);
         }
-        else if (velocity.x > maxNaturalForwardSpeed + progress * extraSpeedPerScore)
+        else if (velocity.x > maxNaturalForwardSpeed/* + progress * extraSpeedPerScore*/)
         {
             GetComponent<ConstantForce>().force = new Vector3(0, 0, 0);
         }

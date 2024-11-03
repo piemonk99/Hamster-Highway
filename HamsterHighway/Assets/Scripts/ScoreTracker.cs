@@ -5,15 +5,32 @@ using UnityEngine;
 [Serializable]
 public class ScoreTracker
 {
-    public static ScoreTracker Instance;
+    private static ScoreTracker instance;
+
+    public static ScoreTracker Instance
+    {
+        get
+        {
+            // Initialize the instance if it is null
+            if (instance == null)
+            {
+                Read();  // This ensures Instance is initialized even if accessed before calling Read
+            }
+            return instance;
+        }
+    }
 
     [NonSerialized] public int score;
     [SerializeField] public int bestScore;
     [NonSerialized] public int prevBestScore;
     [SerializeField] public int coins;
 
+    private ScoreTracker() { }  // Private constructor to prevent direct instantiation
+
     public static void Read()
     {
+        if (instance != null) return;  // Only read if Instance is not already set
+
         ScoreTracker readInstance;
 
         if (File.Exists(Path()))
@@ -21,11 +38,8 @@ public class ScoreTracker
         else
             readInstance = new ScoreTracker();
 
-        if (Instance == null)
-        {
-            Instance = readInstance;
-            Instance.prevBestScore = Instance.bestScore;
-        }
+        instance = readInstance;
+        instance.prevBestScore = instance.bestScore;
     }
 
     public void Write()

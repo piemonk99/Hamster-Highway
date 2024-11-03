@@ -6218,8 +6218,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6971658192007400747}
+  - component: {fileID: 7074085271969919905}
   m_Layer: 5
-  m_Name: SubLevel5
+  m_Name: SubLevel5Medium
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6277,6 +6278,20 @@ Transform:
   - {fileID: 7964199900550699269}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7074085271969919905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6239213134818172239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47f47c4c290a9fa44b0a6411f40a1c21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  difficultyValue: 3
+  isCoreLevel: 1
 --- !u!1 &6240138943029170678
 GameObject:
   m_ObjectHideFlags: 0
