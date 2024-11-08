@@ -297,4 +297,20 @@ public class GameManager : MonoBehaviour
         ball.GetComponent<Hamster>().flippingEnabled = flippingEnabled;
         ball.GetComponent<Hamster>().tiltingEnabled = tiltingEnabled;
     }
+
+    public Vector3 GetRevivePosition()
+    {
+        float xPosition = (subLevelBallIsIn * 16) + .5f; // Sublevel X coordinate
+        float yPosition = IsCurrentSublevelInverted() ? 9 - 1.2f : 1.2f; // Adjust Y based on gravity
+        return new Vector3(xPosition, yPosition, 0);
+    }
+
+    public bool IsCurrentSublevelInverted()
+    {
+        if (subLevelBallIsIn == 0) return false;
+
+        int cycleLength = subLevelsPerGravityInversions * 2;
+        int positionInCycle = subLevelBallIsIn - 1 % cycleLength;
+        return positionInCycle >= subLevelsPerGravityInversions;
+    }
 }

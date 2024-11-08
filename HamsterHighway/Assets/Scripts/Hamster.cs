@@ -9,9 +9,16 @@ public class Hamster : MonoBehaviour
     private Animator animator;
     private Rigidbody rb;
 
+    [SerializeField] private GameObject UICanvas;
+    [SerializeField] private GameObject gameOverUI;
+    private bool isGameOver = false;
+    private int revivesUsed = 0;
+
+    // Reference to GameManager for accessing current sublevel details
+    private GameManager gameManager;
+
     [SerializeField] private float maxNaturalForwardSpeed = 2.0f;
     [SerializeField] private float minimumForwardSpeed = 1.0f;
-    [SerializeField] private float extraSpeedPerScore = 0.005f;
 
     [SerializeField] private float loseBelowY = 0;
     [SerializeField] private float loseAboveY = 10;
@@ -61,6 +68,7 @@ public class Hamster : MonoBehaviour
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        gameManager = FindObjectOfType<GameManager>();
 
         ConstantForce constantForce = gameObject.AddComponent<ConstantForce>();
         constantForce.force = new Vector3(3, 0, 0);
@@ -76,6 +84,8 @@ public class Hamster : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (isGameOver) return; // Stop movement updates if game over
+
         float progress = transform.localPosition.x - startX;
         float minSpeed = minimumForwardSpeed/* + progress * extraSpeedPerScore*/;
 
@@ -90,12 +100,12 @@ public class Hamster : MonoBehaviour
 
         if (transform.localPosition.y < loseBelowY || transform.localPosition.y > loseAboveY)
         {
-            GameOver();
+            TriggerGameOver();
         }
 
         if ((transform.localPosition - previousPosition).magnitude / Time.fixedDeltaTime < loseSpeedFactor * minimumForwardSpeed)
         {
-            GameOver();
+            TriggerGameOver();
         }
 
         previousPosition = transform.localPosition;
@@ -184,20 +194,24 @@ public class Hamster : MonoBehaviour
         }
 
         Vector3 velocity = rb.velocity;
+
+        // Ensure a base constant force is always applied to maintain forward momentum
+        ConstantForce constantForce = GetComponent<ConstantForce>();
+        constantForce.force = new Vector3(3, 0, 0);
+
+        // Adjust the hamster's velocity if it's below minSpeed or exceeding maxNaturalForwardSpeed
         if (velocity.x < minSpeed)
         {
             velocity.x = minSpeed;
             rb.velocity = velocity;
         }
-        else if (velocity.x > minSpeed && velocity.x < maxNaturalForwardSpeed)
+        else if (velocity.x > maxNaturalForwardSpeed)
         {
-            GetComponent<ConstantForce>().force = new Vector3(3, 0, 0);
-        }
-        else if (velocity.x > maxNaturalForwardSpeed/* + progress * extraSpeedPerScore*/)
-        {
-            GetComponent<ConstantForce>().force = new Vector3(0, 0, 0);
+            // Cap the forward speed at maxNaturalForwardSpeed and temporarily reduce force
+            constantForce.force = Vector3.zero;
         }
     }
+
 
     private void LateUpdate()
     {
@@ -278,11 +292,11 @@ public class Hamster : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Hazard"))
         {
-            GameOver();
+            TriggerGameOver();
         }
     }
 
-    private void GameOver()
+    private void TriggerGameOver()
     {
         ScoreTracker.Instance.prevBestScore = ScoreTracker.Instance.bestScore;
 
@@ -290,7 +304,35 @@ public class Hamster : MonoBehaviour
             ScoreTracker.Instance.bestScore = ScoreTracker.Instance.score;
 
         ScoreTracker.Instance.Write();
-        SceneManager.LoadScene("GameOver");
+
+        isGameOver = true;
+        rb.velocity = Vector3.zero;
+        rb.isKinematic = true; // Freeze movement
+        UICanvas.SetActive(false);
+        gameOverUI.SetActive(true);
+        Time.timeScale = 0; // Pause the game
+    }
+
+    public void Revive()
+    {
+        revivesUsed += 1;
+
+        coinsText.text = $"Coins: {ScoreTracker.Instance.coins}";
+
+        // Reset position based on current sublevel and gravity
+        Vector3 revivePosition = gameManager.GetRevivePosition();
+        transform.position = revivePosition;
+
+        // Reset gravity and other movement settings
+        invertedGravity = gameManager.IsCurrentSublevelInverted();
+        transform.Find("Hamster").localScale = invertedGravity ? new Vector3(initialHamsterScale.x, -initialHamsterScale.y, initialHamsterScale.z) : initialHamsterScale;
+
+        isGameOver = false;
+        gameOverUI.SetActive(false);
+        UICanvas.SetActive(true);
+        rb.isKinematic = false;
+
+        Time.timeScale = 1; // Resume game
     }
 
     private void PlayCorrectAnimation()
@@ -306,5 +348,10 @@ public class Hamster : MonoBehaviour
         Vector3 rayDirection = invertedGravity ? Vector3.up : Vector3.down;
         bool isGrounded = Physics.Raycast(transform.position, rayDirection, out RaycastHit hitInfo, 1f);
         animator.SetBool("Grounded", isGrounded);
+    }
+
+    public int GetRevivesUsed()
+    {
+        return revivesUsed;
     }
 }

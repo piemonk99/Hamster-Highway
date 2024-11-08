@@ -79,6 +79,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   difficultyValue: 3
+  isCoreLevel: 0
 --- !u!1001 &192201617116497087
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2179,7 +2180,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6646732724231489081, guid: d2c3a9b2a7025c945af1355a8bd53f1e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.5
+      value: 4.44
       objectReference: {fileID: 0}
     - target: {fileID: 6646732724231489081, guid: d2c3a9b2a7025c945af1355a8bd53f1e, type: 3}
       propertyPath: m_LocalPosition.z
