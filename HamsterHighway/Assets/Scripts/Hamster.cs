@@ -65,6 +65,8 @@ public class Hamster : MonoBehaviour
 
     private void Start()
     {
+        ScoreTracker.Instance.coins = 1500;
+
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;

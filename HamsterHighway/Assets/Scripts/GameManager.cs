@@ -300,6 +300,7 @@ public class GameManager : MonoBehaviour
 
     public Vector3 GetRevivePosition()
     {
+        subLevelBallIsIn++;
         float xPosition = (subLevelBallIsIn * 16) + .5f; // Sublevel X coordinate
         float yPosition = IsCurrentSublevelInverted() ? 9 - 1.2f : 1.2f; // Adjust Y based on gravity
         return new Vector3(xPosition, yPosition, 0);
@@ -310,7 +311,8 @@ public class GameManager : MonoBehaviour
         if (subLevelBallIsIn == 0) return false;
 
         int cycleLength = subLevelsPerGravityInversions * 2;
-        int positionInCycle = subLevelBallIsIn - 1 % cycleLength;
+        int positionInCycle = (subLevelBallIsIn - 1) % cycleLength;
         return positionInCycle >= subLevelsPerGravityInversions;
     }
+
 }

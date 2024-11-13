@@ -12,6 +12,7 @@ public class Options
     // New toggles
     [SerializeField] public bool useAccelerometer = true;
     [SerializeField] public bool invertGravityWithButton = false;
+    [SerializeField] public bool cameraFollowBall = false;
 
     public static void Read()
     {

@@ -12,6 +12,7 @@ public class OptionsMenuController   : MonoBehaviour
 
     [SerializeField] private Toggle accelerometerToggle;
     [SerializeField] private Toggle gravityToggle;
+    [SerializeField] private Toggle cameraFollowToggle;
 
     void Start()
     {
@@ -25,6 +26,7 @@ public class OptionsMenuController   : MonoBehaviour
         // Add listeners for when toggles are changed
         accelerometerToggle.onValueChanged.AddListener(OnAccelerometerToggleChanged);
         gravityToggle.onValueChanged.AddListener(OnGravityToggleChanged);
+        cameraFollowToggle.onValueChanged.AddListener(OnCameraFollowToggleChanged);
     }
 
     public void VolumeSliderSet(float value)
@@ -43,6 +45,12 @@ public class OptionsMenuController   : MonoBehaviour
     private void OnGravityToggleChanged(bool isOn)
     {
         Options.Instance.invertGravityWithButton = isOn;
+        Options.Instance.Write();
+    }
+
+    private void OnCameraFollowToggleChanged(bool isOn)
+    {
+        Options.Instance.cameraFollowBall = isOn;
         Options.Instance.Write();
     }
 
