@@ -63,6 +63,8 @@ public class Hamster : MonoBehaviour
     private int skyboxChangeTracker;
     private int currentSkybox;
 
+    [SerializeField] private bool invulnerable;
+
     private void Start()
     {
         ScoreTracker.Instance.coins = 1500;
@@ -300,6 +302,9 @@ public class Hamster : MonoBehaviour
 
     private void TriggerGameOver()
     {
+        if (invulnerable)
+            return;
+
         ScoreTracker.Instance.prevBestScore = ScoreTracker.Instance.bestScore;
 
         if (ScoreTracker.Instance.score > ScoreTracker.Instance.bestScore)

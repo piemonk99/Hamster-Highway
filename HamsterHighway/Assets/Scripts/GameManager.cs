@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private bool doGeneration = true;
 
+    [SerializeField] private bool arMode = false;
+
     private bool gravityInverted;
     private int subLevelBallIsIn;
     private int currentLevelCenter;
@@ -26,6 +28,8 @@ public class GameManager : MonoBehaviour
 
     private float difficultyBudget = 1.0f;  // Persistent difficulty budget
     private int generatedSublevelCount = 0; // Tracks the total number of sublevels generated
+
+    private Transform prevLevelTransform;
 
 
     // Lists for core sublevels
@@ -38,6 +42,8 @@ public class GameManager : MonoBehaviour
         currentLevelCenter = (int)(subLevelsToLoadAtOnce / 2f);
 
         subLevelQueue = new Queue<GameObject>();
+        subLevelQueue.Enqueue(startSubLevelPrefab);
+        prevLevelTransform = startSubLevelPrefab.transform;
 
         // Initialize core sublevels lists
         coreSubLevels = new List<GameObject>();
@@ -88,7 +94,16 @@ public class GameManager : MonoBehaviour
 
     private GameObject SpawnNewSubLevel(int subLevelNumber)
     {
-        int xPosition = subLevelNumber * 16;
+        // int xPosition = subLevelNumber * 16;
+        Vector3 position = new Vector3(subLevelNumber * 16, 0, 0);
+        Quaternion rotation = Quaternion.identity;
+
+        if (arMode)
+        {
+            position = prevLevelTransform.localPosition + prevLevelTransform.localRotation * Vector3.right * 16;
+            rotation = prevLevelTransform.localRotation * Quaternion.Euler(0, 180 - (subLevelsToLoadAtOnce - 2) * 180f / subLevelsToLoadAtOnce, 0);
+        }
+
         GameObject newSubLevel;
 
         Debug.Log($"Budget before choosing sublevel: {difficultyBudget}");
@@ -98,14 +113,14 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("Spawning gravity inversion sublevel...");
             newSubLevel = PickAndInstantiateSublevel(coreGravityInversionSubLevels, true);
-            PositionAndInvertSubLevel(newSubLevel, xPosition);
+            PositionAndInvertSubLevel(newSubLevel, position, rotation);
             gravityInverted = !gravityInverted;
         }
         else
         {
             // Pick a sublevel based on the current budget from core levels
             newSubLevel = PickAndInstantiateSublevel(coreSubLevels, false);
-            PositionAndInvertSubLevel(newSubLevel, xPosition);
+            PositionAndInvertSubLevel(newSubLevel, position, rotation);
         }
 
         // Update generatedSublevelCount and calculate the budget increment based on it
@@ -145,7 +160,7 @@ public class GameManager : MonoBehaviour
             else
             {
                 Debug.Log($"Variant {variant.name} with difficulty {difficultyValue} - Cannot afford");
-                break; // Stop if we can’t afford the next harder version
+                break; // Stop if we canï¿½t afford the next harder version
             }
         }
 
@@ -203,14 +218,15 @@ public class GameManager : MonoBehaviour
     }
 
 
-    private void PositionAndInvertSubLevel(GameObject subLevel, int xPosition)
+    private void PositionAndInvertSubLevel(GameObject subLevel, Vector3 position, Quaternion rotation)
     {
-        subLevel.transform.localPosition = new Vector3(xPosition, 0, 0);
+        subLevel.transform.SetLocalPositionAndRotation(position, rotation);
+        prevLevelTransform = subLevel.transform;
 
         if (gravityInverted)
         {
             subLevel.transform.localScale = new Vector3(1, -1, 1);
-            subLevel.transform.localPosition = new Vector3(xPosition, 9, 0);
+            subLevel.transform.localPosition = new Vector3(position.x, 9, position.z);
             FlipBoxCollidersInSubLevel(subLevel.transform);
             InvertMoveables(subLevel.transform);
         }

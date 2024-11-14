@@ -2285,6 +2285,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6657313402307886869, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
   m_PrefabInstance: {fileID: 1269069898068515108}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1396932437 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7027571760552252951, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+  m_PrefabInstance: {fileID: 132127702}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1433018167
 GameObject:
   m_ObjectHideFlags: 0
@@ -3077,7 +3082,7 @@ MonoBehaviour:
   ball: {fileID: 1376456097}
   uiManager: {fileID: 1869230036}
   levelParent: {fileID: 2139850469}
-  startSubLevelPrefab: {fileID: 7027571760552252951, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+  startSubLevelPrefab: {fileID: 1396932437}
   subLevelPrefabs:
   - {fileID: 2254665384115040524, guid: 3137a3e6f48203e438161718124ca0ae, type: 3}
   - {fileID: 2972924574791439986, guid: dad7f671bec8d4640af19c92c2056ff7, type: 3}
@@ -3091,6 +3096,7 @@ MonoBehaviour:
   subLevelsToLoadAtOnce: 20
   subLevelsPerGravityInversions: 5
   doGeneration: 1
+  arMode: 1
 --- !u!4 &1832336976
 Transform:
   m_ObjectHideFlags: 0
@@ -4166,6 +4172,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MayDrag: 1
+  ballTransform: {fileID: 0}
 --- !u!1 &2139850468
 GameObject:
   m_ObjectHideFlags: 0
@@ -4514,6 +4521,10 @@ PrefabInstance:
     - target: {fileID: 8769747154265449392, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
       propertyPath: loseBelowY
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8769747154265449392, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
+      propertyPath: invulnerable
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8769747154265449392, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
       propertyPath: inversionsText
