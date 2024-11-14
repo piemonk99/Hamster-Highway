@@ -90,49 +90,38 @@ public class Hamster : MonoBehaviour
     {
         if (isGameOver) return; // Stop movement updates if game over
 
-        float progress = transform.localPosition.x - startX;
-        float minSpeed = minimumForwardSpeed/* + progress * extraSpeedPerScore*/;
+        // Get the current sublevel's rightward facing direction
+        GameObject currentSubLevel = gameManager.GetSubLevel(gameManager.subLevelBallIsIn);
+        if (currentSubLevel == null)
+        {
+            Debug.LogError("Current sublevel not found!");
+            return;
+        }
+
+        Vector3 subLevelRight = currentSubLevel.transform.right;
+        float minSpeed = minimumForwardSpeed;
 
         debugText.text = $"{Input.acceleration}";
         Vector3 accelerometer = Input.acceleration;
 
-        
-
         HandleGravity(accelerometer.y);
+        HandleSpeed(minSpeed, accelerometer.x);
 
-        HandleSpeed(minSpeed, progress, accelerometer.x);
-
-        if (transform.localPosition.y < loseBelowY || transform.localPosition.y > loseAboveY)
+        if (Vector3.Dot(transform.position, Vector3.up) < loseBelowY || Vector3.Dot(transform.position, Vector3.up) > loseAboveY)
         {
             TriggerGameOver();
         }
 
-        if ((transform.localPosition - previousPosition).magnitude / Time.fixedDeltaTime < loseSpeedFactor * minimumForwardSpeed)
+        if (rb.velocity.magnitude < loseSpeedFactor * minimumForwardSpeed)
         {
             TriggerGameOver();
         }
 
         previousPosition = transform.localPosition;
 
-        ScoreTracker.Instance.score = Mathf.RoundToInt(progress);
-        scoreText.text = $"Score: {ScoreTracker.Instance.score}";
-
-
         PlayCorrectAnimation();
-
-        if (progress - skyboxChangeTracker * skyboxChangeInterval > skyboxChangeInterval)
-        {
-            ++skyboxChangeTracker;
-            int temp = currentSkybox;
-            do
-            {
-                currentSkybox = Random.Range(0, skyboxes.Length);
-            } while (currentSkybox == temp);
-
-            RenderSettings.skybox = skyboxes[currentSkybox];
-            DynamicGI.UpdateEnvironment();
-        }
     }
+
 
     private void HandleGravity(float accelerometerY)
     {
@@ -189,32 +178,74 @@ public class Hamster : MonoBehaviour
         }
     }
 
-    private void HandleSpeed(float minSpeed, float progress, float accelerometerX)
+    private void HandleSpeed(float minSpeed, float accelerometerX)
     {
-        if (tiltingEnabled)
+        // Get the current sublevel's rightward facing direction
+        GameObject currentSubLevel = gameManager.GetSubLevel(gameManager.subLevelBallIsIn);
+        if (currentSubLevel == null)
         {
-            rb.AddForce(new Vector3(Input.gyro.rotationRate.y * yawForce, 0, 0));
-            minSpeed += accelerometerX < 0 ? Mathf.Lerp(accelerometerMinSpeed, 0, -accelerometerX) : Mathf.Lerp(0, accelerometerMaxSpeed, accelerometerX);
+            Debug.LogError("Current sublevel not found!");
+            return;
         }
 
-        Vector3 velocity = rb.velocity;
+        Vector3 subLevelRight = currentSubLevel.transform.right;
+
+        // Calculate the current speed in the direction of the sublevel's rightward facing
+        float currentSpeed = Vector3.Dot(rb.velocity, subLevelRight);
+
+        // Adjust minSpeed based on accelerometer input if tilting is enabled
+        if (tiltingEnabled)
+        {
+            rb.AddForce(subLevelRight * Input.gyro.rotationRate.y * yawForce, ForceMode.Force);
+            minSpeed += accelerometerX < 0
+                ? Mathf.Lerp(accelerometerMinSpeed, 0, -accelerometerX)
+                : Mathf.Lerp(0, accelerometerMaxSpeed, accelerometerX);
+        }
 
         // Ensure a base constant force is always applied to maintain forward momentum
         ConstantForce constantForce = GetComponent<ConstantForce>();
-        constantForce.force = new Vector3(3, 0, 0);
+        constantForce.force = subLevelRight * 3; // Apply constant force in the direction of sublevel's rightward facing
 
-        // Adjust the hamster's velocity if it's below minSpeed or exceeding maxNaturalForwardSpeed
-        if (velocity.x < minSpeed)
+        // Adjust the hamster's velocity based on minSpeed and max speed constraints
+        if (currentSpeed < minSpeed)
         {
-            velocity.x = minSpeed;
-            rb.velocity = velocity;
+            rb.velocity += subLevelRight * (minSpeed - currentSpeed);
         }
-        else if (velocity.x > maxNaturalForwardSpeed)
+        else if (currentSpeed > maxNaturalForwardSpeed)
         {
-            // Cap the forward speed at maxNaturalForwardSpeed and temporarily reduce force
-            constantForce.force = Vector3.zero;
+            constantForce.force = Vector3.zero; // Cap forward force when exceeding max speed
         }
     }
+
+
+
+    // Redirects horizontal velocity to match the new sublevel's rightward facing direction
+    public void RedirectVelocity()
+    {
+        // Get the current sublevel GameObject
+        GameObject currentSubLevel = gameManager.GetSubLevel(gameManager.subLevelBallIsIn);
+        if (currentSubLevel == null)
+        {
+            Debug.LogError("Current sublevel not found!");
+            return;
+        }
+
+        // Calculate the rightward facing direction of the current sublevel
+        Vector3 subLevelRight = currentSubLevel.transform.right;
+
+        // Extract the horizontal velocity (x and z components)
+        Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+
+        // Project the horizontal velocity onto the sublevel's rightward facing direction
+        Vector3 redirectedHorizontalVelocity = Vector3.Project(horizontalVelocity, subLevelRight);
+
+        // Combine the vertical component (y) with the redirected horizontal velocity
+        rb.velocity = new Vector3(redirectedHorizontalVelocity.x, rb.velocity.y, redirectedHorizontalVelocity.z);
+
+        Debug.Log($"Redirected velocity: {rb.velocity}, SubLevelRight: {subLevelRight}");
+    }
+
+
 
 
     private void LateUpdate()

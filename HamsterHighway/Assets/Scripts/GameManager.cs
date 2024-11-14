@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,7 +21,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private bool arMode = false;
 
     private bool gravityInverted;
-    private int subLevelBallIsIn;
+    public int subLevelBallIsIn;
     private int currentLevelCenter;
 
     private bool flippingEnabled;
@@ -28,6 +29,7 @@ public class GameManager : MonoBehaviour
 
     private float difficultyBudget = 1.0f;  // Persistent difficulty budget
     private int generatedSublevelCount = 0; // Tracks the total number of sublevels generated
+    private Dictionary<int, GameObject> subLevelDictionary;
 
     private Transform prevLevelTransform;
 
@@ -44,6 +46,7 @@ public class GameManager : MonoBehaviour
         subLevelQueue = new Queue<GameObject>();
         subLevelQueue.Enqueue(startSubLevelPrefab);
         prevLevelTransform = startSubLevelPrefab.transform;
+        subLevelDictionary = new Dictionary<int, GameObject>();
 
         // Initialize core sublevels lists
         coreSubLevels = new List<GameObject>();
@@ -62,11 +65,15 @@ public class GameManager : MonoBehaviour
                 coreGravityInversionSubLevels.Add(subLevel);
         }
 
+        subLevelQueue.Enqueue(GameObject.Find("StartingSubLevel"));
+
         if (doGeneration)
         {
-            for (int i = 1; i < subLevelsToLoadAtOnce; i++)
+            for (int i = 1; i < subLevelsToLoadAtOnce - 1; i++)
             {
-                subLevelQueue.Enqueue(SpawnNewSubLevel(i));
+                var newSubLevel = SpawnNewSubLevel(i);
+                subLevelQueue.Enqueue(newSubLevel);
+                subLevelDictionary[i] = newSubLevel;
             }
         }
 
@@ -81,12 +88,28 @@ public class GameManager : MonoBehaviour
         if (!doGeneration)
             return;
 
-        Debug.Log(subLevelBallIsIn);
+        Debug.Log($"SubLevelBallIsIn: {subLevelBallIsIn}");
 
         while (subLevelBallIsIn >= currentLevelCenter)
         {
-            subLevelQueue.Enqueue(SpawnNewSubLevel(currentLevelCenter + (subLevelsToLoadAtOnce / 2)));
-            Destroy(subLevelQueue.Dequeue());
+            var newSubLevelNumber = currentLevelCenter + (subLevelsToLoadAtOnce / 2);
+            var newSubLevel = SpawnNewSubLevel(newSubLevelNumber);
+
+            subLevelQueue.Enqueue(newSubLevel);
+            subLevelDictionary[newSubLevelNumber] = newSubLevel; // Add to the dictionary
+
+            var oldSubLevel = subLevelQueue.Dequeue();
+            Destroy(oldSubLevel);
+
+            // Remove the dequeued sublevel from the dictionary
+            foreach (var kvp in subLevelDictionary)
+            {
+                if (kvp.Value == oldSubLevel)
+                {
+                    subLevelDictionary.Remove(kvp.Key);
+                    break;
+                }
+            }
 
             currentLevelCenter++;
         }
@@ -316,6 +339,9 @@ public class GameManager : MonoBehaviour
     public Vector3 GetRevivePosition()
     {
         subLevelBallIsIn++;
+
+        Debug.Log($"Reviving in sublevel {GetSubLevel(subLevelBallIsIn)}");
+
         float xPosition = (subLevelBallIsIn * 16) + .5f; // Sublevel X coordinate
         float yPosition = IsCurrentSublevelInverted() ? 9 - 1.2f : 1.2f; // Adjust Y based on gravity
         subLevelBallIsIn--;
@@ -329,6 +355,17 @@ public class GameManager : MonoBehaviour
         int cycleLength = subLevelsPerGravityInversions * 2;
         int positionInCycle = (subLevelBallIsIn - 1) % cycleLength;
         return positionInCycle >= subLevelsPerGravityInversions;
+    }
+
+    public GameObject GetSubLevel(int subLevelNumber)
+    {
+        if (subLevelDictionary.TryGetValue(subLevelNumber, out var subLevel))
+        {
+            return subLevel;
+        }
+
+        Debug.LogWarning($"SubLevel {subLevelNumber} not found in dictionary.");
+        return null;
     }
 
     public void IncrementSubLevelBallIsIn()
