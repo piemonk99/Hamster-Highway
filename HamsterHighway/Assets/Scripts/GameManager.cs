@@ -75,8 +75,7 @@ public class GameManager : MonoBehaviour
         if (!doGeneration)
             return;
 
-        // Check ball's progress and spawn more of the level every time it goes the length of a level
-        subLevelBallIsIn = (int)(ball.position.x / 16f);
+        Debug.Log(subLevelBallIsIn);
 
         while (subLevelBallIsIn >= currentLevelCenter)
         {
@@ -303,6 +302,7 @@ public class GameManager : MonoBehaviour
         subLevelBallIsIn++;
         float xPosition = (subLevelBallIsIn * 16) + .5f; // Sublevel X coordinate
         float yPosition = IsCurrentSublevelInverted() ? 9 - 1.2f : 1.2f; // Adjust Y based on gravity
+        subLevelBallIsIn--;
         return new Vector3(xPosition, yPosition, 0);
     }
 
@@ -315,4 +315,8 @@ public class GameManager : MonoBehaviour
         return positionInCycle >= subLevelsPerGravityInversions;
     }
 
+    public void IncrementSubLevelBallIsIn()
+    {
+        subLevelBallIsIn++;
+    }
 }
