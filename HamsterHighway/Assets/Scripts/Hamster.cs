@@ -190,8 +190,11 @@ public class Hamster : MonoBehaviour
 
         Vector3 subLevelRight = currentSubLevel.transform.right;
 
-        // Calculate the current speed in the direction of the sublevel's rightward facing
-        float currentSpeed = Vector3.Dot(rb.velocity, subLevelRight);
+        // Extract horizontal velocity (x and z components only)
+        Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+
+        // Calculate the current horizontal speed in the direction of the sublevel's rightward facing
+        float currentSpeed = Vector3.Dot(horizontalVelocity, subLevelRight);
 
         // Adjust minSpeed based on accelerometer input if tilting is enabled
         if (tiltingEnabled)
@@ -202,24 +205,33 @@ public class Hamster : MonoBehaviour
                 : Mathf.Lerp(0, accelerometerMaxSpeed, accelerometerX);
         }
 
-        // Ensure a base constant force is always applied to maintain forward momentum
-        ConstantForce constantForce = GetComponent<ConstantForce>();
-        constantForce.force = subLevelRight * 3; // Apply constant force in the direction of sublevel's rightward facing
-
-        // Adjust the hamster's velocity based on minSpeed and max speed constraints
+        // Ensure the hamster's horizontal velocity is at least minSpeed
         if (currentSpeed < minSpeed)
         {
-            rb.velocity += subLevelRight * (minSpeed - currentSpeed);
+            Vector3 additionalForce = subLevelRight.normalized * (minSpeed - currentSpeed);
+            rb.velocity += additionalForce; // Adjust horizontal velocity
         }
-        else if (currentSpeed > maxNaturalForwardSpeed)
+
+        // Ensure a base constant force is always applied to maintain forward momentum
+        ConstantForce constantForce = GetComponent<ConstantForce>();
+        constantForce.force = subLevelRight.normalized * 3;
+
+        // Cap the horizontal velocity if exceeding max speed
+        if (currentSpeed > maxNaturalForwardSpeed)
         {
-            constantForce.force = Vector3.zero; // Cap forward force when exceeding max speed
+            horizontalVelocity = subLevelRight.normalized * maxNaturalForwardSpeed;
+            rb.velocity = new Vector3(horizontalVelocity.x, rb.velocity.y, horizontalVelocity.z); // Preserve vertical velocity
+            constantForce.force = Vector3.zero; // Stop applying extra force
         }
+
+        Debug.Log($"HandleSpeed: CurrentSpeed: {currentSpeed}, MinSpeed: {minSpeed}, Velocity: {rb.velocity}, SubLevelRight: {subLevelRight}");
     }
 
 
 
-    // Redirects horizontal velocity to match the new sublevel's rightward facing direction
+
+
+
     public void RedirectVelocity()
     {
         // Get the current sublevel GameObject
@@ -233,17 +245,20 @@ public class Hamster : MonoBehaviour
         // Calculate the rightward facing direction of the current sublevel
         Vector3 subLevelRight = currentSubLevel.transform.right;
 
-        // Extract the horizontal velocity (x and z components)
+        // Calculate the original horizontal speed magnitude
         Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        float originalSpeed = horizontalVelocity.magnitude;
 
-        // Project the horizontal velocity onto the sublevel's rightward facing direction
-        Vector3 redirectedHorizontalVelocity = Vector3.Project(horizontalVelocity, subLevelRight);
+        // Redirect horizontal velocity
+        Vector3 redirectedHorizontalVelocity = subLevelRight.normalized * originalSpeed;
 
         // Combine the vertical component (y) with the redirected horizontal velocity
         rb.velocity = new Vector3(redirectedHorizontalVelocity.x, rb.velocity.y, redirectedHorizontalVelocity.z);
 
-        Debug.Log($"Redirected velocity: {rb.velocity}, SubLevelRight: {subLevelRight}");
+        Debug.Log($"Redirected velocity: {rb.velocity}, SubLevelRight (unit vector): {subLevelRight}");
     }
+
+
 
 
 

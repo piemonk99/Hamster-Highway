@@ -5,20 +5,18 @@ using UnityEngine;
 public class LevelEnteredTrigger : MonoBehaviour
 {
     private GameManager gameManager;
-    private Hamster hamster;
 
     private void Awake()
     {
         gameManager = FindObjectOfType<GameManager>();
-        hamster = gameManager.GetComponent<Hamster>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            hamster.RedirectVelocity();
             gameManager.IncrementSubLevelBallIsIn();
+            other.GetComponent<Hamster>().RedirectVelocity();
             Destroy(gameObject);
         }
     }

@@ -65,7 +65,9 @@ public class GameManager : MonoBehaviour
                 coreGravityInversionSubLevels.Add(subLevel);
         }
 
-        subLevelQueue.Enqueue(GameObject.Find("StartingSubLevel"));
+        GameObject startingSubLevel = GameObject.Find("StartingSubLevel");
+        subLevelQueue.Enqueue(startingSubLevel);
+        subLevelDictionary.Add(0, startingSubLevel);
 
         if (doGeneration)
         {
@@ -88,7 +90,7 @@ public class GameManager : MonoBehaviour
         if (!doGeneration)
             return;
 
-        Debug.Log($"SubLevelBallIsIn: {subLevelBallIsIn}");
+        //Debug.Log($"SubLevelBallIsIn: {subLevelBallIsIn}");
 
         while (subLevelBallIsIn >= currentLevelCenter)
         {
