@@ -100,7 +100,7 @@ public class GameManager : MonoBehaviour
 
         if (arMode)
         {
-            position = prevLevelTransform.localPosition + prevLevelTransform.localRotation * Vector3.right * 16;
+            position = new Vector3(prevLevelTransform.localPosition.x, 0, prevLevelTransform.localPosition.z) + prevLevelTransform.localRotation * Vector3.right * 16;
             rotation = prevLevelTransform.localRotation * Quaternion.Euler(0, 180 - (subLevelsToLoadAtOnce - 2) * 180f / subLevelsToLoadAtOnce, 0);
         }
 
