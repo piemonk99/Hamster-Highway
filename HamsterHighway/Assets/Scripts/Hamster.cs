@@ -52,16 +52,16 @@ public class Hamster : MonoBehaviour
     private bool tripping;
     private bool rolling;
 
-    private float gravityCooldownTimer = 0f;
-    private float gravityCooldownDuration = 1.5f;
+    private float gravityCooldownTimer = 0;
+    private float gravityCooldownDuration = 3;
     private int gravityInversionCredits = 5;
     private int maxGravityInversionCredits = 5;
     private float previousAccelerometerY;
 
     private float previousYVelocity = 0;
     private Vector3 initialHamsterScale;
-    private int skyboxChangeTracker;
-    private int currentSkybox;
+    // private int skyboxChangeTracker;
+    // private int currentSkybox;
 
     [SerializeField] private bool invulnerable;
 

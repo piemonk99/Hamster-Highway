@@ -13,6 +13,7 @@ public class Options
     [SerializeField] public bool useAccelerometer = true;
     [SerializeField] public bool invertGravityWithButton = false;
     [SerializeField] public bool cameraFollowBall = false;
+    [SerializeField] public bool arMode = true;
 
     public static void Read()
     {

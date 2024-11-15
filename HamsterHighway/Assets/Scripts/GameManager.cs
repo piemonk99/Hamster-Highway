@@ -84,6 +84,9 @@ public class GameManager : MonoBehaviour
         Options.Read();
         ScoreTracker.Read();
         RefreshOptions();
+
+        if (arMode)
+            levelParent.position = new Vector3(levelParent.position.x, levelParent.position.y, 16 / (2 * Mathf.Sin(Mathf.PI / (subLevelsToLoadAtOnce + 1))));
     }
 
     private void Update()
@@ -263,36 +266,36 @@ public class GameManager : MonoBehaviour
         // Find all MoveablePlatformAndTrack and MoveableWallAndTrack objects in the subLevel
         foreach (Transform interactable in subLevel.GetComponentsInChildren<Transform>())
         {
-            if (interactable.name == "MoveablePlatformAndTrack" || interactable.name == "MoveableWallAndTrack")
-            {
-                Transform moveableChild = interactable.Find("MoveablePlatform") ?? interactable.Find("MoveableWall");
+            // if (interactable.name == "MoveablePlatformAndTrack" || interactable.name == "MoveableWallAndTrack")
+            // {
+            //     Transform moveableChild = interactable.Find("MoveablePlatform") ?? interactable.Find("MoveableWall");
 
-                if (moveableChild != null)
-                {
-                    MoveableObject moveableScript = moveableChild.GetComponent<MoveableObject>();
-                    if (moveableScript != null && moveableScript.moveableType == MoveableObject.MoveableTypes.Vertical)
-                    {
-                        // Swap forward and backward distances
-                        float tempDistance = moveableScript.forwardMaxDistance;
-                        moveableScript.forwardMaxDistance = moveableScript.backwardMaxDistance;
-                        moveableScript.backwardMaxDistance = tempDistance;
-                    }
-                }
-            }
-            else if (interactable.name == "RotateablePlatformAndTrack") // Handle rotational platforms
-            {
-                RotatableObject rotatableScript = interactable.Find("RotateablePlatform")?.GetComponent<RotatableObject>();
-                if (rotatableScript != null)
-                {
-                    // Swap forward and backward angles
-                    float tempAngle = rotatableScript.forwardMaxAngle;
-                    rotatableScript.forwardMaxAngle = rotatableScript.backwardMaxAngle;
-                    rotatableScript.backwardMaxAngle = tempAngle;
+            //     if (moveableChild != null)
+            //     {
+            //         MoveableObject moveableScript = moveableChild.GetComponent<MoveableObject>();
+            //         if (moveableScript != null && moveableScript.moveableType == MoveableObject.MoveableTypes.Vertical)
+            //         {
+            //             // Swap forward and backward distances
+            //             float tempDistance = moveableScript.forwardMaxDistance;
+            //             moveableScript.forwardMaxDistance = moveableScript.backwardMaxDistance;
+            //             moveableScript.backwardMaxDistance = tempDistance;
+            //         }
+            //     }
+            // }
+            // else if (interactable.name == "RotateablePlatformAndTrack") // Handle rotational platforms
+            // {
+            //     RotatableObject rotatableScript = interactable.Find("RotateablePlatform")?.GetComponent<RotatableObject>();
+            //     if (rotatableScript != null)
+            //     {
+            //         // Swap forward and backward angles
+            //         float tempAngle = rotatableScript.forwardMaxAngle;
+            //         rotatableScript.forwardMaxAngle = rotatableScript.backwardMaxAngle;
+            //         rotatableScript.backwardMaxAngle = tempAngle;
 
-                    rotatableScript.startingAngle *= -1;
-                }
-            }
-            else if (interactable.name == "Booster Pad" || interactable.name == "Strong Booster Pad")
+            //         rotatableScript.startingAngle *= -1;
+            //     }
+            // }
+            if (interactable.name == "Booster Pad" || interactable.name == "Strong Booster Pad")
             {
                 BoostPad boostPadScript = interactable.GetComponent<BoostPad>();
                 if (boostPadScript != null)

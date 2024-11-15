@@ -81,7 +81,6 @@ public class Track
     }
 }*/
 
-using System;
 using UnityEngine;
 
 public class Track
@@ -98,10 +97,10 @@ public class Track
     {
         //Instantiate the TrackEnd objects
         trackEndA = GameObject.Instantiate(trackEndPrefab, parent).transform;
-        trackEndA.position = endAPosition;
+        trackEndA.position = parent.TransformPoint(endAPosition);
 
         trackEndB = GameObject.Instantiate(trackEndPrefab, parent).transform;
-        trackEndB.position = endBPosition;
+        trackEndB.position = parent.TransformPoint(endBPosition);
 
         //Instantiate the TrackObject and place it between the TrackEnds
         trackObject = GameObject.Instantiate(trackObjectPrefab, parent).transform;
@@ -114,10 +113,10 @@ public class Track
 
         //Calculate the positions of the track ends along the arc
         trackEndA = GameObject.Instantiate(trackEndPrefab, parent).transform;
-        trackEndA.position = CalculateArcPoint(pivotPoint, radius, -backwardDegrees);
+        trackEndA.position = parent.TransformPoint(CalculateArcPoint(pivotPoint, radius, -backwardDegrees));
 
         trackEndB = GameObject.Instantiate(trackEndPrefab, parent).transform;
-        trackEndB.position = CalculateArcPoint(pivotPoint, radius, forwardDegrees);
+        trackEndB.position = parent.TransformPoint(CalculateArcPoint(pivotPoint, radius, forwardDegrees));
 
         float increment = 0.1f / Vector3.Distance(CalculateArcPoint(Vector3.zero, radius, 0), CalculateArcPoint(Vector3.zero, radius, 1));
 
@@ -125,8 +124,7 @@ public class Track
         {
             // Instantiate the TrackObject and generate the curved shape
             trackObject = GameObject.Instantiate(trackObjectPrefab, parent).transform;
-            trackObject.position = CalculateArcPoint(pivotPoint, radius, progress);
-            trackObject.rotation = Quaternion.Euler(0, 0, progress);
+            trackObject.SetPositionAndRotation(parent.TransformPoint(CalculateArcPoint(pivotPoint, radius, progress)), parent.rotation * Quaternion.Euler(0, 0, progress));
         }
     }
 
@@ -149,9 +147,9 @@ public class Track
         float distance = direction.magnitude;
 
         //Position the trackObject at the midpoint, rotate it to align with the trackEnds, and scale it to meet both trackEnds
-        trackObject.position = (trackEndA.position + trackEndB.position) / 2f;
-        trackObject.rotation = Quaternion.LookRotation(direction);
-        trackObject.localScale = new Vector3(trackObject.localScale.x, trackObject.localScale.y, distance - 0.45f);
+        Vector3 pos = (trackEndA.position + trackEndB.position) / 2f;
+        trackObject.SetPositionAndRotation(pos, Quaternion.LookRotation(direction, -pos.normalized));
+        trackObject.localScale = new Vector3(trackObject.localScale.x, trackObject.localScale.y, distance);
     }
 }
 

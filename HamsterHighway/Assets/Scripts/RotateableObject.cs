@@ -34,7 +34,7 @@ public class RotatableObject : MonoBehaviour
 
         //Gets pivot point and radius
         radiusVector = new Vector3(transform.localScale.x / 2, 0, 0);
-        pivotPoint = transform.position - radiusVector;
+        pivotPoint = transform.localPosition - radiusVector;
         rb.centerOfMass = -radiusVector;
 
         destination = Quaternion.Euler(0, 0, Mathf.Clamp(startingAngle, -backwardMaxAngle, forwardMaxAngle)) * Vector3.right;
@@ -44,24 +44,27 @@ public class RotatableObject : MonoBehaviour
 
         movingToDestination = true;
 
-        transform.rotation = Quaternion.Euler(destination);
+        transform.localRotation = Quaternion.Euler(destination);
     }
 
-    public void OnMouseDrag()
+    void OnMouseDrag()
     {
         if (!draggingObject)
         {
             draggingObject = true;
-            mainCamera.GetComponent<CameraController>().MayDrag = false;
+
+            if (mainCamera.GetComponent<CameraController>() != null)
+                mainCamera.GetComponent<CameraController>().MayDrag = false;
+
             movingToDestination = false;
         }
 
-        HandleRotation(mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10f)));
+        HandleRotation(transform.parent.InverseTransformPoint(mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, mainCamera.WorldToScreenPoint(transform.position).z))));
     }
 
-    private void HandleRotation(Vector3 worldPosition)
+    private void HandleRotation(Vector3 relativePosition)
     {
-        Vector3 directionFromPivot = worldPosition - pivotPoint;
+        Vector3 directionFromPivot = relativePosition - pivotPoint;
         float targetAngle = Mathf.Atan2(directionFromPivot.y, directionFromPivot.x) * Mathf.Rad2Deg;
 
         //Clamp the target angle within the allowed range
@@ -79,7 +82,9 @@ public class RotatableObject : MonoBehaviour
         if (draggingObject)
         {
             draggingObject = false;
-            mainCamera.GetComponent<CameraController>().MayDrag = true;
+
+            if (mainCamera.GetComponent<CameraController>() != null)
+                mainCamera.GetComponent<CameraController>().MayDrag = true;
 
             //Start lerping to the last position after releasing the mouse
             movingToDestination = true;
@@ -94,13 +99,13 @@ public class RotatableObject : MonoBehaviour
                 mouseDownPosition = Input.mousePosition;
             else if (Input.GetMouseButtonUp(0) && Vector3.Distance(mouseDownPosition, Input.mousePosition) < 0.1)
             {
-                    Vector3 worldPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-                    worldPosition.z = pivotPoint.z;
-                    Vector3 clampedPosition = pivotPoint + (worldPosition - pivotPoint).normalized * transform.localScale.x;
-                    Vector3 directionFromPivot = worldPosition - pivotPoint;
+                    Vector3 localClickPosition = transform.parent.InverseTransformPoint(mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, mainCamera.WorldToScreenPoint(transform.position).z)));
+                    localClickPosition.z = pivotPoint.z;
+                    Vector3 clampedPosition = pivotPoint + (localClickPosition - pivotPoint).normalized * transform.localScale.x;
+                    Vector3 directionFromPivot = localClickPosition - pivotPoint;
                     float angle = Mathf.Atan2(directionFromPivot.y, directionFromPivot.x) * Mathf.Rad2Deg;
 
-                    if (angle >= -backwardMaxAngle - 5 && angle <= forwardMaxAngle + 5 && Vector3.Distance(worldPosition, clampedPosition) < 0.3)
+                    if (angle >= -backwardMaxAngle - 5 && angle <= forwardMaxAngle + 5 && Vector3.Distance(localClickPosition, clampedPosition) < 0.3)
                     {
                         HandleRotation(clampedPosition);
                         movingToDestination = true;
@@ -118,12 +123,10 @@ public class RotatableObject : MonoBehaviour
     private void MoveToDestination(Vector3 targetDirection)
     {
         rb.constraints = RigidbodyConstraints.FreezePosition;
-        rb.angularVelocity += new Vector3(0, 0, Mathf.Sign(Vector3.SignedAngle(transform.right, targetDirection, Vector3.forward)) * acceleration * Time.deltaTime);
+        rb.angularVelocity += transform.parent.TransformDirection(new Vector3(0, 0, Mathf.Sign(Vector3.SignedAngle(transform.right, transform.parent.TransformDirection(targetDirection), Vector3.forward)) * acceleration * Time.deltaTime));
 
         if (rb.angularVelocity.magnitude > Mathf.PI / 2)
-        {
-            rb.angularVelocity = new Vector3(0, 0, Mathf.Clamp(rb.angularVelocity.z, -Mathf.PI / 2, Mathf.PI / 2));
-        }
+            rb.angularVelocity = rb.angularVelocity.normalized * Mathf.PI / 2;
 
         //Lerp the current angle to the target angle
         // currentAngle = Mathf.Lerp(currentAngle, targetAngle, Time.deltaTime * 8f);
@@ -140,7 +143,7 @@ public class RotatableObject : MonoBehaviour
         // transform.rotation = targetRotation;
 
         //Stop lerping if we are close enough to the last target angle
-        if (Vector3.Angle(targetDirection, transform.right) <= rb.angularVelocity.z * Mathf.Rad2Deg * Time.fixedDeltaTime)
+        if (Vector3.Angle(transform.parent.TransformDirection(targetDirection), transform.right) <= rb.angularVelocity.magnitude * Mathf.Rad2Deg * Time.fixedDeltaTime * 2)
         {
             rb.angularVelocity = Vector3.zero;
             rb.constraints = RigidbodyConstraints.FreezeAll;

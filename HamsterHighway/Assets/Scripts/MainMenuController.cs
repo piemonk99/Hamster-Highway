@@ -16,6 +16,8 @@ public class MainMenuController : MonoBehaviour
         Options.Read();
         ScoreTracker.Read();
         bestScoreText.text = $"Best Score: {ScoreTracker.Instance.bestScore}";
+        ARToggle.isOn = Options.Instance.arMode;
+        ARToggle.onValueChanged.AddListener(OnARToggleChanged);
     }
 
     public void StartButtonClicked()
@@ -39,5 +41,11 @@ public class MainMenuController : MonoBehaviour
     public void QuitButtonClicked()
     {
         Application.Quit();
+    }
+
+    private void OnARToggleChanged(bool isOn)
+    {
+        Options.Instance.arMode = isOn;
+        Options.Instance.Write();
     }
 }

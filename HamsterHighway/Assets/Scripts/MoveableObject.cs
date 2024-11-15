@@ -32,7 +32,7 @@ public class MoveableObject : MonoBehaviour
         rb = GetComponent<Rigidbody>();
 
         mainCamera = Camera.main;
-        initialPosition = transform.position;
+        initialPosition = transform.localPosition;
 
         Vector3 forwardDistanceVector, backwardDistanceVector;
 
@@ -51,7 +51,7 @@ public class MoveableObject : MonoBehaviour
         }
         platformTrack = new Track(initialPosition - backwardDistanceVector, initialPosition + forwardDistanceVector, trackEndPrefab, trackObjectPrefab, transform.parent);
 
-        destination = transform.position;
+        destination = initialPosition;
     }
 
     public void OnMouseDrag()
@@ -59,18 +59,18 @@ public class MoveableObject : MonoBehaviour
         if (!draggingObject)
         {
             draggingObject = true;
-            if (mainCamera.isActiveAndEnabled)
-            {
+
+            if (mainCamera.GetComponent<CameraController>() != null)
                 mainCamera.GetComponent<CameraController>().MayDrag = false;
-            }
+
             movingToDestination = false; // Stop automatic lerping when user drags
         }
 
         Vector3 screenPosition = Input.mousePosition;
         // screenPosition.z = 10; // Set the z-distance for screen to world conversion
 
-        Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
-        destination = ClampToTrack(worldPosition);
+        Vector3 relativePosition = transform.parent.InverseTransformPoint(mainCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, mainCamera.WorldToScreenPoint(transform.position).z)));
+        destination = ClampToTrack(relativePosition);
 
         // // Get the Rigidbody component
         // Rigidbody rb = GetComponent<Rigidbody>();
@@ -91,7 +91,7 @@ public class MoveableObject : MonoBehaviour
 
     private Vector3 ClampToTrack(Vector3 position)
     {
-        Vector3 newPosition = transform.position;
+        Vector3 newPosition = transform.localPosition;
 
         switch (moveableType)
         {
@@ -118,10 +118,9 @@ public class MoveableObject : MonoBehaviour
         if (draggingObject)
         {
             draggingObject = false;
-            if (mainCamera.isActiveAndEnabled)
-            {
+
+            if (mainCamera.GetComponent<CameraController>() != null)
                 mainCamera.GetComponent<CameraController>().MayDrag = true;
-            }
             
             movingToDestination = true; // Continue moving to the destination after mouse release
         }
@@ -135,11 +134,11 @@ public class MoveableObject : MonoBehaviour
                 mouseDownPosition = Input.mousePosition;
             else if (Input.GetMouseButtonUp(0) && Vector3.Distance(mouseDownPosition, Input.mousePosition) < 0.1)
             {
-                Vector3 worldPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-                worldPosition.z = transform.position.z;
-                Vector3 clampedPosition = ClampToTrack(worldPosition);
+                Vector3 localClickPosition = transform.parent.InverseTransformPoint(mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, mainCamera.WorldToScreenPoint(transform.position).z)));
+                localClickPosition.z = transform.localPosition.z;
+                Vector3 clampedPosition = ClampToTrack(localClickPosition);
 
-                if (Vector3.Distance(worldPosition, clampedPosition) < 0.3)
+                if (Vector3.Distance(localClickPosition, clampedPosition) < 0.3)
                 {
                     destination = clampedPosition;
                     movingToDestination = true;
@@ -156,25 +155,13 @@ public class MoveableObject : MonoBehaviour
 
     private void MoveToDestination()
     {
-        rb.constraints = RigidbodyConstraints.FreezeRotation | (moveableType == MoveableTypes.Horizontal ? RigidbodyConstraints.FreezePositionY : RigidbodyConstraints.FreezePositionX) | RigidbodyConstraints.FreezePositionZ;     
+        rb.constraints = RigidbodyConstraints.FreezeRotation | (moveableType == MoveableTypes.Horizontal ? RigidbodyConstraints.FreezePositionY : (RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ));
         // Accelerate smoothly
         // float actualSpeed = Mathf.Lerp(rb.velocity.magnitude, acceleration, Time.deltaTime * 8);
-        rb.velocity += (destination - transform.position).normalized * acceleration * Time.deltaTime;
-
+        rb.velocity += transform.parent.TransformDirection((destination - transform.localPosition).normalized * acceleration * Time.deltaTime);
 
         if (rb.velocity.magnitude > 8f)
-        {
-            switch (moveableType)
-            {
-                case MoveableTypes.Horizontal:
-                    rb.velocity = new Vector3(Mathf.Clamp(rb.velocity.x, -8f, 8f), 0, 0);
-                    break;
-
-                case MoveableTypes.Vertical:
-                    rb.velocity = new Vector3(0, Mathf.Clamp(rb.velocity.y, -8f, 8f), 0);
-                    break;
-            }
-        }
+            rb.velocity = rb.velocity.normalized * 8;
 
         // // Lerp the platform towards the last position
         // Vector3 lerpedPosition = Vector3.Lerp(transform.position, lastPosition, Time.deltaTime * 8f);
@@ -187,9 +174,10 @@ public class MoveableObject : MonoBehaviour
 
         // Update the parent transform's position to match the Rigidbody's position
         transform.position = rb.position;
+        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 0);
 
         // Stop moving if the platform is close enough to the destination
-        if (Vector3.Distance(transform.position, destination) <= rb.velocity.magnitude * Time.fixedDeltaTime || ((destination - transform.position).normalized - rb.velocity.normalized).magnitude > 0.01f)
+        if (Vector3.Distance(transform.localPosition, destination) <= rb.velocity.magnitude * Time.fixedDeltaTime || ((destination - transform.localPosition).normalized - transform.parent.InverseTransformDirection(rb.velocity).normalized).magnitude > 0.01f)
         {
             rb.velocity = Vector3.zero;
             rb.constraints = RigidbodyConstraints.FreezeAll;
