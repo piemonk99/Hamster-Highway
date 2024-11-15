@@ -282,20 +282,21 @@ public class GameManager : MonoBehaviour
             //         }
             //     }
             // }
-            // else if (interactable.name == "RotateablePlatformAndTrack") // Handle rotational platforms
-            // {
-            //     RotatableObject rotatableScript = interactable.Find("RotateablePlatform")?.GetComponent<RotatableObject>();
-            //     if (rotatableScript != null)
-            //     {
-            //         // Swap forward and backward angles
-            //         float tempAngle = rotatableScript.forwardMaxAngle;
-            //         rotatableScript.forwardMaxAngle = rotatableScript.backwardMaxAngle;
-            //         rotatableScript.backwardMaxAngle = tempAngle;
+            if (interactable.name == "RotateablePlatformAndTrack") // Handle rotational platforms
+            {
+                RotatableObject rotatableScript = interactable.Find("RotateablePlatform")?.GetComponent<RotatableObject>();
+                if (rotatableScript != null)
+                {
+                    // Swap forward and backward angles
+                    // float tempAngle = rotatableScript.forwardMaxAngle;
+                    // rotatableScript.forwardMaxAngle = rotatableScript.backwardMaxAngle;
+                    // rotatableScript.backwardMaxAngle = tempAngle;
 
-            //         rotatableScript.startingAngle *= -1;
-            //     }
-            // }
-            if (interactable.name == "Booster Pad" || interactable.name == "Strong Booster Pad")
+                    // rotatableScript.startingAngle *= -1;
+                    rotatableScript.inverted = true;
+                }
+            }
+            else if (interactable.name == "Booster Pad" || interactable.name == "Strong Booster Pad")
             {
                 BoostPad boostPadScript = interactable.GetComponent<BoostPad>();
                 if (boostPadScript != null)

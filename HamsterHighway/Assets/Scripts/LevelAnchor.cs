@@ -5,15 +5,17 @@ using UnityEngine;
 
 public class LevelAnchor : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] bool mouseDrag;
 
-    // Update is called once per frame
+    Vector3 lastMousePosition;
+
     void Update()
     {
-        transform.Rotate(new Vector3(-Input.gyro.rotationRate.x, -Input.gyro.rotationRate.y, Input.gyro.rotationRate.z) * 180 / MathF.PI * Time.deltaTime);
+        if (!mouseDrag)
+            transform.Rotate(new Vector3(-Input.gyro.rotationRate.x, -Input.gyro.rotationRate.y, Input.gyro.rotationRate.z) * 180 / MathF.PI * Time.deltaTime);
+        else if (Input.GetMouseButton(0))
+            transform.rotation *= Quaternion.Euler((Input.mousePosition.y - lastMousePosition.y) * 10 * Time.deltaTime, 0, 0) * Quaternion.Euler(0, (Input.mousePosition.x - lastMousePosition.x) * 10 * Time.deltaTime, 0);
+
+        lastMousePosition = Input.mousePosition;
     }
 }

@@ -17,14 +17,16 @@ public class RotatableObject : MonoBehaviour
 
     [SerializeField] private float acceleration = 30f; // The angular acceleration the platform applies to move towards its destination
 
-    private Vector3 pivotPoint;
-    private Vector3 radiusVector;
-    private Vector3 destination;
+    // private Vector3 pivotPoint;
+    // private Vector3 radiusVector;
+    private Quaternion destination;
     private bool movingToDestination;
 
     private Vector3 mouseDownPosition;
 
     private Rigidbody rb;
+
+    public bool inverted;
 
     private void Start()
     {
@@ -33,18 +35,19 @@ public class RotatableObject : MonoBehaviour
         mainCamera = Camera.main;
 
         //Gets pivot point and radius
-        radiusVector = new Vector3(transform.localScale.x / 2, 0, 0);
-        pivotPoint = transform.localPosition - radiusVector;
-        rb.centerOfMass = -radiusVector;
+        // radiusVector = new Vector3(transform.localScale.x / 2, 0, 0);
+        // pivotPoint = transform.localPosition - radiusVector;
+        rb.centerOfMass = Vector3.zero;
 
-        destination = Quaternion.Euler(0, 0, Mathf.Clamp(startingAngle, -backwardMaxAngle, forwardMaxAngle)) * Vector3.right;
+        float clampedStartingAngle = Mathf.Clamp(startingAngle, -backwardMaxAngle, forwardMaxAngle);
+        destination = Quaternion.Euler(0, 0, inverted ? clampedStartingAngle - 180 : clampedStartingAngle);
 
         //Creates track
-        platformTrack = new Track(pivotPoint, transform.localScale.x, forwardMaxAngle, backwardMaxAngle, trackEndPrefab, trackObjectPrefab, transform.parent);
+        platformTrack = new Track(transform.localPosition, transform.localScale.x, forwardMaxAngle, backwardMaxAngle, trackEndPrefab, trackObjectPrefab, transform.parent);
 
         movingToDestination = true;
 
-        transform.localRotation = Quaternion.Euler(destination);
+        transform.localRotation = destination;
     }
 
     void OnMouseDrag()
@@ -64,7 +67,7 @@ public class RotatableObject : MonoBehaviour
 
     private void HandleRotation(Vector3 relativePosition)
     {
-        Vector3 directionFromPivot = relativePosition - pivotPoint;
+        Vector3 directionFromPivot = relativePosition - transform.localPosition;
         float targetAngle = Mathf.Atan2(directionFromPivot.y, directionFromPivot.x) * Mathf.Rad2Deg;
 
         //Clamp the target angle within the allowed range
@@ -74,7 +77,7 @@ public class RotatableObject : MonoBehaviour
         // MoveToDestination(clampedTargetAngle);
 
         //Store the clamped target angle for when the user lets go
-        destination = Quaternion.Euler(0, 0, clampedTargetAngle) * Vector3.right;
+        destination = Quaternion.Euler(0, 0, inverted ? clampedTargetAngle - 180 : clampedTargetAngle);
     }
 
     public void OnMouseUp()
@@ -100,9 +103,9 @@ public class RotatableObject : MonoBehaviour
             else if (Input.GetMouseButtonUp(0) && Vector3.Distance(mouseDownPosition, Input.mousePosition) < 0.1)
             {
                     Vector3 localClickPosition = transform.parent.InverseTransformPoint(mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, mainCamera.WorldToScreenPoint(transform.position).z)));
-                    localClickPosition.z = pivotPoint.z;
-                    Vector3 clampedPosition = pivotPoint + (localClickPosition - pivotPoint).normalized * transform.localScale.x;
-                    Vector3 directionFromPivot = localClickPosition - pivotPoint;
+                    localClickPosition.z = transform.localPosition.z;
+                    Vector3 clampedPosition = transform.localPosition + (localClickPosition - transform.localPosition).normalized * transform.localScale.x;
+                    Vector3 directionFromPivot = localClickPosition - transform.localPosition;
                     float angle = Mathf.Atan2(directionFromPivot.y, directionFromPivot.x) * Mathf.Rad2Deg;
 
                     if (angle >= -backwardMaxAngle - 5 && angle <= forwardMaxAngle + 5 && Vector3.Distance(localClickPosition, clampedPosition) < 0.3)
@@ -120,19 +123,24 @@ public class RotatableObject : MonoBehaviour
         }
     }
 
-    private void MoveToDestination(Vector3 targetDirection)
+    private void MoveToDestination(Quaternion targetRotation)
     {
         rb.constraints = RigidbodyConstraints.FreezePosition;
-        rb.angularVelocity += transform.parent.TransformDirection(new Vector3(0, 0, Mathf.Sign(Vector3.SignedAngle(transform.right, transform.parent.TransformDirection(targetDirection), Vector3.forward)) * acceleration * Time.deltaTime));
+        // Debug.Log($"T={targetRotation.eulerAngles.z} C={transform.localRotation.eulerAngles.z} D={targetRotation.eulerAngles.z - transform.localRotation.eulerAngles.z}");
+        float delta = targetRotation.eulerAngles.z - transform.localRotation.eulerAngles.z;
 
-        if (rb.angularVelocity.magnitude > Mathf.PI / 2)
-            rb.angularVelocity = rb.angularVelocity.normalized * Mathf.PI / 2;
+        if (delta > 180)
+            delta = -1;
+        else if (delta < -180)
+            delta = 1;
+
+        rb.angularVelocity += transform.parent.TransformDirection(new Vector3(0, 0, Mathf.Sign(delta) * acceleration * Time.deltaTime));
 
         //Lerp the current angle to the target angle
         // currentAngle = Mathf.Lerp(currentAngle, targetAngle, Time.deltaTime * 8f);
 
         //Calculate the position based on the lerped angle to stay on the arc
-        
+
         // Vector3 rotatedPosition = pivotPoint + (Quaternion.Euler(0, 0, currentAngle) * radiusVector);
         // rb.MovePosition(rotatedPosition);
 
@@ -141,9 +149,20 @@ public class RotatableObject : MonoBehaviour
         //Rotate the platform to match the current angle
         // Quaternion targetRotation = Quaternion.AngleAxis(currentAngle, Vector3.forward);
         // transform.rotation = targetRotation;
+        transform.localRotation = Quaternion.Euler(0, 0, transform.localRotation.eulerAngles.z);
+        // Vector3 localAV = transform.parent.TransformDirection(rb.angularVelocity);
+        // rb.angularVelocity = transform.parent.InverseTransformDirection(new Vector3(0, 0, localAV.z));
 
-        //Stop lerping if we are close enough to the last target angle
-        if (Vector3.Angle(transform.parent.TransformDirection(targetDirection), transform.right) <= rb.angularVelocity.magnitude * Mathf.Rad2Deg * Time.fixedDeltaTime * 2)
+        if (rb.angularVelocity.magnitude > Mathf.PI / 2)
+            rb.angularVelocity = rb.angularVelocity.normalized * Mathf.PI / 2;
+
+        float angle = Quaternion.Angle(targetRotation, transform.localRotation);
+
+        if (inverted)
+            angle = 180 - angle;
+
+        //Stop lerping if we are close enough to the target angle
+        if (angle <= rb.angularVelocity.magnitude * Mathf.Rad2Deg * Time.fixedDeltaTime * 2)
         {
             rb.angularVelocity = Vector3.zero;
             rb.constraints = RigidbodyConstraints.FreezeAll;
