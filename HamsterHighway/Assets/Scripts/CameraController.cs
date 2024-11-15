@@ -10,7 +10,7 @@ public class CameraController : MonoBehaviour
     private Vector3 dragPosition;
     private bool followBall; // Determines if the camera should follow the ball
 
-    void Start()
+    private void Start()
     {
         cam = GetComponent<Camera>();
 
@@ -22,11 +22,11 @@ public class CameraController : MonoBehaviour
         MayDrag = !followBall;
     }
 
-    void Update()
+    private void Update()
     {
         if (followBall)
         {
-            FollowBall();
+            SnapToBall();
         }
         else
         {
@@ -34,7 +34,7 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    private void FollowBall()
+    public void SnapToBall()
     {
         if (ballTransform != null)
         {

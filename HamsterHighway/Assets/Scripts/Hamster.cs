@@ -413,6 +413,12 @@ public class Hamster : MonoBehaviour
         UICanvas.SetActive(true);
         rb.isKinematic = false;
 
+        // Focus the camera on the ball once
+        if (Camera.main.isActiveAndEnabled)
+        {
+            Camera.main.GetComponent<CameraController>().SnapToBall();
+        }
+
         Time.timeScale = 1; // Resume game
     }
 
