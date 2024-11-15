@@ -210,21 +210,17 @@ public class Hamster : MonoBehaviour
         {
             Vector3 additionalForce = subLevelRight.normalized * (minSpeed - currentSpeed) * 2; // Boost for sharp turns
             rb.velocity += additionalForce; // Adjust horizontal velocity
-            Debug.Log($"AdditionalForce Applied: {additionalForce}");
         }
 
         // Ensure a base constant force is always applied to maintain forward momentum
         ConstantForce constantForce = GetComponent<ConstantForce>();
         constantForce.force = subLevelRight.normalized * 3;
-        Debug.Log($"ConstantForce Applied: {constantForce.force}");
 
         // Cap the horizontal velocity if exceeding max speed
         if (currentSpeed > maxNaturalForwardSpeed)
         {
             constantForce.force = Vector3.zero; // Stop applying extra force
         }
-
-        Debug.Log($"HandleSpeed: CurrentSpeed: {currentSpeed}, MinSpeed: {minSpeed}, Velocity: {rb.velocity}, SubLevelRight: {subLevelRight}, Force: {constantForce.force}");
     }
 
     public void RedirectVelocity()
@@ -258,8 +254,6 @@ public class Hamster : MonoBehaviour
 
         // Combine the vertical component (y) with the redirected horizontal velocity
         rb.velocity = new Vector3(redirectedHorizontalVelocity.x, rb.velocity.y, redirectedHorizontalVelocity.z);
-
-        Debug.Log($"Redirected velocity: {rb.velocity}, SubLevelRight (unit vector): {subLevelRight}");
     }
 
     private void LockToPlane()
@@ -342,8 +336,6 @@ public class Hamster : MonoBehaviour
         GameObject currentSubLevel = gameManager.GetSubLevel(gameManager.subLevelBallIsIn);
 
         hamsterModel.rotation = Quaternion.Euler(0, -90 + currentSubLevel.transform.eulerAngles.y, 0);
-
-        
     }
 
     private bool IsHamsterAlignedWithParent()

@@ -68,6 +68,7 @@ public class GameManager : MonoBehaviour
         GameObject startingSubLevel = GameObject.Find("StartingSubLevel");
         subLevelQueue.Enqueue(startingSubLevel);
         subLevelDictionary.Add(0, startingSubLevel);
+        generatedSublevelCount++;
 
         if (doGeneration)
         {
@@ -90,18 +91,15 @@ public class GameManager : MonoBehaviour
         if (!doGeneration)
             return;
 
-        //Debug.Log($"SubLevelBallIsIn: {subLevelBallIsIn}");
-
         while (subLevelBallIsIn >= currentLevelCenter)
         {
-            var newSubLevelNumber = currentLevelCenter + (subLevelsToLoadAtOnce / 2);
-            var newSubLevel = SpawnNewSubLevel(newSubLevelNumber);
+            var newSubLevel = SpawnNewSubLevel(generatedSublevelCount);
 
             subLevelQueue.Enqueue(newSubLevel);
-            subLevelDictionary[newSubLevelNumber] = newSubLevel; // Add to the dictionary
+            subLevelDictionary[generatedSublevelCount - 1] = newSubLevel; // Add to the dictionary
 
             var oldSubLevel = subLevelQueue.Dequeue();
-            //Destroy(oldSubLevel);
+            Destroy(oldSubLevel);
 
             // Remove the dequeued sublevel from the dictionary
             foreach (var kvp in subLevelDictionary)
@@ -117,6 +115,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
     private GameObject SpawnNewSubLevel(int subLevelNumber)
     {
         // int xPosition = subLevelNumber * 16;
@@ -125,18 +124,20 @@ public class GameManager : MonoBehaviour
 
         if (arMode)
         {
+            int numSides = subLevelsToLoadAtOnce + 1;
+
             position = new Vector3(prevLevelTransform.localPosition.x, 0, prevLevelTransform.localPosition.z) + prevLevelTransform.localRotation * Vector3.right * 16;
-            rotation = prevLevelTransform.localRotation * Quaternion.Euler(0, 180 - (subLevelsToLoadAtOnce - 2) * 180f / subLevelsToLoadAtOnce, 0);
+            rotation = prevLevelTransform.localRotation * Quaternion.Euler(0, 180 - (numSides - 2) * 180f / numSides, 0);
         }
 
         GameObject newSubLevel;
 
-        Debug.Log($"Budget before choosing sublevel: {difficultyBudget}");
+        ///Debug.Log($"Budget before choosing sublevel: {difficultyBudget}");
 
         // Swap gravity using a gravity inversion sublevel every certain number of levels
         if (subLevelNumber % subLevelsPerGravityInversions == 0)
         {
-            Debug.Log("Spawning gravity inversion sublevel...");
+            ///Debug.Log("Spawning gravity inversion sublevel...");
             newSubLevel = PickAndInstantiateSublevel(coreGravityInversionSubLevels, true);
             PositionAndInvertSubLevel(newSubLevel, position, rotation);
             gravityInverted = !gravityInverted;
@@ -156,8 +157,8 @@ public class GameManager : MonoBehaviour
         // Clamp difficultyBudget between -7 and 12
         difficultyBudget = Mathf.Clamp(difficultyBudget, -7.0f, 12.0f);
 
-        Debug.Log($"Difficulty budget gained back after spawning: {budgetIncrease}");
-        Debug.Log($"Final budget after spawning: {difficultyBudget}");
+        ///Debug.Log($"Difficulty budget gained back after spawning: {budgetIncrease}");
+        ///Debug.Log($"Final budget after spawning: {difficultyBudget}");
 
         return newSubLevel;
     }
@@ -167,7 +168,7 @@ public class GameManager : MonoBehaviour
     {
         // Randomly pick a core level
         GameObject chosenCoreLevel = coreLevels[Random.Range(0, coreLevels.Count)];
-        Debug.Log($"Core level chosen: {chosenCoreLevel.name}");
+        ///Debug.Log($"Core level chosen: {chosenCoreLevel.name}");
 
         // Retrieve all versions of this core level by finding subsequent entries in subLevelPrefabs
         List<GameObject> levelVariants = GetAllLevelVariants(chosenCoreLevel, isGravityInversion);
@@ -179,24 +180,24 @@ public class GameManager : MonoBehaviour
             int difficultyValue = variant.GetComponent<SublevelDifficulty>().difficultyValue;
             if (difficultyValue <= difficultyBudget)
             {
-                Debug.Log($"Variant {variant.name} with difficulty {difficultyValue} - Can afford");
+                ///Debug.Log($"Variant {variant.name} with difficulty {difficultyValue} - Can afford");
                 chosenLevel = variant;
             }
             else
             {
-                Debug.Log($"Variant {variant.name} with difficulty {difficultyValue} - Cannot afford");
+                ///Debug.Log($"Variant {variant.name} with difficulty {difficultyValue} - Cannot afford");
                 break; // Stop if we can�t afford the next harder version
             }
         }
 
         // If no affordable level variant was found, default to the easiest variant
         chosenLevel = chosenLevel ?? levelVariants[0];
-        Debug.Log($"Chosen variant: {chosenLevel.name} with difficulty {chosenLevel.GetComponent<SublevelDifficulty>().difficultyValue}");
+        ///Debug.Log($"Chosen variant: {chosenLevel.name} with difficulty {chosenLevel.GetComponent<SublevelDifficulty>().difficultyValue}");
 
         // Adjust the budget by subtracting the difficulty value
         float chosenDifficultyValue = chosenLevel.GetComponent<SublevelDifficulty>().difficultyValue;
         difficultyBudget -= chosenDifficultyValue;
-        Debug.Log($"Budget deducted for chosen variant: {chosenDifficultyValue}");
+        ///Debug.Log($"Budget deducted for chosen variant: {chosenDifficultyValue}");
 
         // Instantiate the chosen level
         return Instantiate(chosenLevel, levelParent);

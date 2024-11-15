@@ -1745,7 +1745,7 @@ MonoBehaviour:
   - {fileID: 4495728076952984282, guid: 1af0b5be67d24e449837322952d2c9f4, type: 3}
   gravityInversionSubLevelPrefabs:
   - {fileID: 4978317053609484475, guid: a795659fe73cf41438d130f7f75aa8e4, type: 3}
-  subLevelsToLoadAtOnce: 20
+  subLevelsToLoadAtOnce: 10
   subLevelsPerGravityInversions: 5
   doGeneration: 1
   arMode: 1
@@ -4166,8 +4166,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1702912847}
   - {fileID: 1376456097}
+  - {fileID: 1702912847}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1269069898068515108
