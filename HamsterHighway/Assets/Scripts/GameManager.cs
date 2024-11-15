@@ -1,17 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; } // Singleton instance
+
     [SerializeField] private Transform ball;
     [SerializeField] private UIManager uiManager;
+    public TextMeshProUGUI scoreText;
 
     [SerializeField] private Transform levelParent;
     [SerializeField] private GameObject startSubLevelPrefab;
     [SerializeField] private GameObject[] subLevelPrefabs;
     [SerializeField] private GameObject[] gravityInversionSubLevelPrefabs;
     private Queue<GameObject> subLevelQueue;
+    [SerializeField] private GameObject scoreTriggersPrefab;
 
     [SerializeField] private int subLevelsToLoadAtOnce = 10;
     [SerializeField] private int subLevelsPerGravityInversions = 5;
@@ -40,6 +46,16 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        // If an instance of GameManager already exists, destroy this one
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        // Set this as the singleton instance
+        Instance = this;
+
         subLevelBallIsIn = 0;
         currentLevelCenter = (int)(subLevelsToLoadAtOnce / 2f);
 
@@ -151,6 +167,10 @@ public class GameManager : MonoBehaviour
             newSubLevel = PickAndInstantiateSublevel(coreSubLevels, false);
             PositionAndInvertSubLevel(newSubLevel, position, rotation);
         }
+
+        // Instantiates score triggers for sublevel
+        Instantiate(scoreTriggersPrefab, newSubLevel.transform);
+
 
         // Update generatedSublevelCount and calculate the budget increment based on it
         generatedSublevelCount++;

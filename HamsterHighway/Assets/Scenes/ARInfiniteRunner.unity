@@ -1739,12 +1739,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ball: {fileID: 1376456097}
   uiManager: {fileID: 1869230036}
+  scoreText: {fileID: 1024634092}
   levelParent: {fileID: 2139850469}
   startSubLevelPrefab: {fileID: 1396932437}
   subLevelPrefabs:
   - {fileID: 4495728076952984282, guid: 1af0b5be67d24e449837322952d2c9f4, type: 3}
   gravityInversionSubLevelPrefabs:
   - {fileID: 4978317053609484475, guid: a795659fe73cf41438d130f7f75aa8e4, type: 3}
+  scoreTriggersPrefab: {fileID: 1267227594201468958, guid: e9baaaf54bdcb9a4984ed96ef94bbedd, type: 3}
   subLevelsToLoadAtOnce: 10
   subLevelsPerGravityInversions: 5
   doGeneration: 1
@@ -3045,6 +3047,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ball: {fileID: 1376456097}
   uiManager: {fileID: 1869230036}
+  scoreText: {fileID: 1024634092}
   levelParent: {fileID: 2139850469}
   startSubLevelPrefab: {fileID: 1396932437}
   subLevelPrefabs:
@@ -3057,6 +3060,7 @@ MonoBehaviour:
   - {fileID: 4495728076952984282, guid: 1af0b5be67d24e449837322952d2c9f4, type: 3}
   gravityInversionSubLevelPrefabs:
   - {fileID: 4978317053609484475, guid: a795659fe73cf41438d130f7f75aa8e4, type: 3}
+  scoreTriggersPrefab: {fileID: 1267227594201468958, guid: e9baaaf54bdcb9a4984ed96ef94bbedd, type: 3}
   subLevelsToLoadAtOnce: 10
   subLevelsPerGravityInversions: 5
   doGeneration: 1
