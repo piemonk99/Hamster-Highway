@@ -342,7 +342,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 277050056541208572, guid: 38063e1cf7fc8ec4f9196a38a68352ce, type: 3}
       propertyPath: m_Name
-      value: MoveablePlatformAndTrack (2)
+      value: MoveablePlatformAndTrack
       objectReference: {fileID: 0}
     - target: {fileID: 3673711848231488965, guid: 38063e1cf7fc8ec4f9196a38a68352ce, type: 3}
       propertyPath: forwardMaxDistance
@@ -912,7 +912,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 277050056541208572, guid: 38063e1cf7fc8ec4f9196a38a68352ce, type: 3}
       propertyPath: m_Name
-      value: MoveablePlatformAndTrack (1)
+      value: MoveablePlatformAndTrack
       objectReference: {fileID: 0}
     - target: {fileID: 1248543467690491810, guid: 38063e1cf7fc8ec4f9196a38a68352ce, type: 3}
       propertyPath: m_IsActive

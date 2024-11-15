@@ -208,29 +208,24 @@ public class Hamster : MonoBehaviour
         // Ensure the hamster's horizontal velocity is at least minSpeed
         if (currentSpeed < minSpeed)
         {
-            Vector3 additionalForce = subLevelRight.normalized * (minSpeed - currentSpeed);
+            Vector3 additionalForce = subLevelRight.normalized * (minSpeed - currentSpeed) * 2; // Boost for sharp turns
             rb.velocity += additionalForce; // Adjust horizontal velocity
+            Debug.Log($"AdditionalForce Applied: {additionalForce}");
         }
 
         // Ensure a base constant force is always applied to maintain forward momentum
         ConstantForce constantForce = GetComponent<ConstantForce>();
         constantForce.force = subLevelRight.normalized * 3;
+        Debug.Log($"ConstantForce Applied: {constantForce.force}");
 
         // Cap the horizontal velocity if exceeding max speed
         if (currentSpeed > maxNaturalForwardSpeed)
         {
-            horizontalVelocity = subLevelRight.normalized * maxNaturalForwardSpeed;
-            rb.velocity = new Vector3(horizontalVelocity.x, rb.velocity.y, horizontalVelocity.z); // Preserve vertical velocity
             constantForce.force = Vector3.zero; // Stop applying extra force
         }
 
-        Debug.Log($"HandleSpeed: CurrentSpeed: {currentSpeed}, MinSpeed: {minSpeed}, Velocity: {rb.velocity}, SubLevelRight: {subLevelRight}");
+        Debug.Log($"HandleSpeed: CurrentSpeed: {currentSpeed}, MinSpeed: {minSpeed}, Velocity: {rb.velocity}, SubLevelRight: {subLevelRight}, Force: {constantForce.force}");
     }
-
-
-
-
-
 
     public void RedirectVelocity()
     {
@@ -241,6 +236,15 @@ public class Hamster : MonoBehaviour
             Debug.LogError("Current sublevel not found!");
             return;
         }
+
+        Transform hamsterModel = transform.Find("Hamster");
+
+        // Align the hamster's rotation with the current sublevel
+        float targetYRotation = currentSubLevel.transform.eulerAngles.y - 90; // Offset as needed
+        Quaternion targetRotation = Quaternion.Euler(hamsterModel.eulerAngles.x, targetYRotation, hamsterModel.eulerAngles.z);
+
+        hamsterModel.rotation = targetRotation;
+
 
         // Calculate the rightward facing direction of the current sublevel
         Vector3 subLevelRight = currentSubLevel.transform.right;
@@ -258,14 +262,41 @@ public class Hamster : MonoBehaviour
         Debug.Log($"Redirected velocity: {rb.velocity}, SubLevelRight (unit vector): {subLevelRight}");
     }
 
+    private void LockToPlane()
+    {
+        // Get the current sublevel GameObject
+        GameObject currentSubLevel = gameManager.GetSubLevel(gameManager.subLevelBallIsIn);
+        if (currentSubLevel == null)
+        {
+            Debug.LogError("LockToPlane: Current sublevel not found!");
+            return;
+        }
 
+        // Get the sublevel's transform
+        Transform subLevelTransform = currentSubLevel.transform;
 
+        // Transform the hamster's position into the sublevel's local space
+        Vector3 localPosition = subLevelTransform.InverseTransformPoint(transform.position);
 
+        // Reset only the local X and Z coordinates, keeping Y unchanged
+        localPosition.y = Mathf.Clamp(localPosition.y, -8f, 8f); // Optional: Clamp within level bounds
+        localPosition.z = 0; // Align to the center plane (local Z)
 
+        // Convert the position back to world space
+        Vector3 correctedPosition = subLevelTransform.TransformPoint(localPosition);
+
+        // Apply the corrected position without affecting the Y value
+        rb.MovePosition(new Vector3(correctedPosition.x, transform.position.y, correctedPosition.z));
+
+        // Debug logs and visual aids
+        ///Debug.Log($"LockToPlane: LocalPosition: {localPosition}, CorrectedPosition: {correctedPosition}, SubLevel: {currentSubLevel.name}");
+        ///Debug.DrawLine(correctedPosition, correctedPosition + Vector3.up * 5, Color.green, 0.1f);
+    }
 
     private void LateUpdate()
     {
         HandleRolling();
+        LockToPlane(); // Ensure the hamster stays on the plane of the current sublevel
     }
 
     private void HandleRolling()
@@ -307,7 +338,12 @@ public class Hamster : MonoBehaviour
 
     private void CorrectHamsterRotation()
     {
-        transform.GetChild(0).rotation = Quaternion.Euler(0, -90, 0);
+        Transform hamsterModel = transform.Find("Hamster");
+        GameObject currentSubLevel = gameManager.GetSubLevel(gameManager.subLevelBallIsIn);
+
+        hamsterModel.rotation = Quaternion.Euler(0, -90 + currentSubLevel.transform.eulerAngles.y, 0);
+
+        
     }
 
     private bool IsHamsterAlignedWithParent()

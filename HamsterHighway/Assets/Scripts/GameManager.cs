@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour
             subLevelDictionary[newSubLevelNumber] = newSubLevel; // Add to the dictionary
 
             var oldSubLevel = subLevelQueue.Dequeue();
-            Destroy(oldSubLevel);
+            //Destroy(oldSubLevel);
 
             // Remove the dequeued sublevel from the dictionary
             foreach (var kvp in subLevelDictionary)

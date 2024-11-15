@@ -59,7 +59,10 @@ public class MoveableObject : MonoBehaviour
         if (!draggingObject)
         {
             draggingObject = true;
-            mainCamera.GetComponent<CameraController>().MayDrag = false;
+            if (mainCamera.isActiveAndEnabled)
+            {
+                mainCamera.GetComponent<CameraController>().MayDrag = false;
+            }
             movingToDestination = false; // Stop automatic lerping when user drags
         }
 
@@ -115,7 +118,11 @@ public class MoveableObject : MonoBehaviour
         if (draggingObject)
         {
             draggingObject = false;
-            mainCamera.GetComponent<CameraController>().MayDrag = true;
+            if (mainCamera.isActiveAndEnabled)
+            {
+                mainCamera.GetComponent<CameraController>().MayDrag = true;
+            }
+            
             movingToDestination = true; // Continue moving to the destination after mouse release
         }
     }
