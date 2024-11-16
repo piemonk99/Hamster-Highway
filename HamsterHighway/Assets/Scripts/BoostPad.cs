@@ -13,10 +13,17 @@ public class BoostPad : MonoBehaviour
 
     private bool used;
 
+    public bool inverted;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
+    }
+    
+    void Update()
+    {
+        Debug.DrawLine(transform.position, transform.position + (inverted ? -transform.up : transform.up) * 5);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -34,10 +41,9 @@ public class BoostPad : MonoBehaviour
             case Direction.Up:
                 rb.velocity = new Vector3 (rb.velocity.x, 0, rb.velocity.z);
                 rb.AddForce(new Vector3(0, 450f * boostForceMultiplier, 0));
-
                 break;
             case Direction.Forward:
-                rb.AddForce(new Vector3(450f * boostForceMultiplier, 0, 0));
+                rb.AddForce((inverted ? -transform.up : transform.up) * 450f * boostForceMultiplier);
                 break;
             case Direction.Down:
                 rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);

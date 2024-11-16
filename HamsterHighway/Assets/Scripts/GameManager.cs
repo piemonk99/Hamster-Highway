@@ -323,6 +323,8 @@ public class GameManager : MonoBehaviour
                 {
                     if (boostPadScript.direction == BoostPad.Direction.Up) boostPadScript.direction = BoostPad.Direction.Down;
                     else if (boostPadScript.direction == BoostPad.Direction.Down) boostPadScript.direction = BoostPad.Direction.Up;
+
+                    boostPadScript.inverted = true;
                 }
             }
         }
