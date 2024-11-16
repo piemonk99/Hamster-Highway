@@ -65,6 +65,9 @@ public class Hamster : MonoBehaviour
 
     [SerializeField] private bool invulnerable;
 
+    private float reviveGracePeriod = 1.5f;
+    private float reviveGraceTimer;
+
     private void Start()
     {
         ScoreTracker.Instance.coins = 1500;
@@ -90,6 +93,16 @@ public class Hamster : MonoBehaviour
     {
         if (isGameOver) return; // Stop movement updates if game over
 
+        if (rb.isKinematic)
+        {
+            reviveGraceTimer -= Time.fixedDeltaTime;
+
+            if (reviveGraceTimer <= 0)
+                rb.isKinematic = false;
+
+            return;
+        }
+
         // Get the current sublevel's rightward facing direction
         GameObject currentSubLevel = gameManager.GetSubLevel(gameManager.subLevelBallIsIn);
         if (currentSubLevel == null)
@@ -107,12 +120,13 @@ public class Hamster : MonoBehaviour
         HandleGravity(accelerometer.y);
         HandleSpeed(minSpeed, accelerometer.x);
 
-        if (Vector3.Dot(transform.position, Vector3.up) < loseBelowY || Vector3.Dot(transform.position, Vector3.up) > loseAboveY)
+        if (transform.localPosition.y < loseBelowY || transform.localPosition.y > loseAboveY)
         {
             TriggerGameOver();
         }
 
-        if (rb.velocity.magnitude < loseSpeedFactor * minimumForwardSpeed)
+        // The hamster is going backwards if the dot product is less than 0
+        if ((transform.localPosition - previousPosition).magnitude / Time.fixedDeltaTime < loseSpeedFactor * minimumForwardSpeed || Vector3.Dot(rb.velocity, subLevelRight) < 0)
         {
             TriggerGameOver();
         }
@@ -344,7 +358,7 @@ public class Hamster : MonoBehaviour
         float parentZRotation = transform.eulerAngles.z;
         float childXRotation = transform.GetChild(0).localRotation.eulerAngles.x;
 
-        // We want the parent�s rotation to be close to the inverse of the child's locked rotation
+        // We want the parent's rotation to be close to the inverse of the child's locked rotation
         float rotationDifference = Mathf.Abs(((parentZRotation + 180) % 360) - childXRotation);
 
         // Tolerance to account for slight differences
@@ -404,6 +418,8 @@ public class Hamster : MonoBehaviour
         Vector3 revivePosition = gameManager.GetRevivePosition();
         transform.position = revivePosition;
 
+        reviveGraceTimer = reviveGracePeriod;
+
         // Reset gravity and other movement settings
         invertedGravity = gameManager.IsCurrentSublevelInverted();
         transform.Find("Hamster").localScale = invertedGravity ? new Vector3(initialHamsterScale.x, -initialHamsterScale.y, initialHamsterScale.z) : initialHamsterScale;
@@ -411,10 +427,9 @@ public class Hamster : MonoBehaviour
         isGameOver = false;
         gameOverUI.SetActive(false);
         UICanvas.SetActive(true);
-        rb.isKinematic = false;
 
         // Focus the camera on the ball once
-        if (Camera.main.isActiveAndEnabled)
+        if (Camera.main.GetComponent<CameraController>() != null)
         {
             Camera.main.GetComponent<CameraController>().SnapToBall();
         }

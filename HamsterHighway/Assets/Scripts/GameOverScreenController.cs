@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameOverScreenController : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI newBestScoreText;
 
-    [SerializeField] private GameObject reviveButton;
+    [SerializeField] private Button reviveButton;
     [SerializeField] private TextMeshProUGUI reviveCostText;
 
     [SerializeField] private Hamster hamster; // Reference to Hamster script
@@ -45,7 +46,7 @@ public class GameOverScreenController : MonoBehaviour
     {
         int reviveCost = 50 + (50 * hamster.GetRevivesUsed());
         reviveCostText.text = (reviveCost).ToString();
-        reviveButton.SetActive(ScoreTracker.Instance.coins > reviveCost);
+        reviveButton.enabled = ScoreTracker.Instance.coins > reviveCost;
     }
 
     public void MainMenuButtonClicked()

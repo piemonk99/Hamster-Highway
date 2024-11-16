@@ -55,4 +55,10 @@ public class BoostPad : MonoBehaviour
 
         used = true;
     }
+
+    public void ResetBoostPad()
+    {
+        used = false;
+        animator.Play("Idle");
+    }
 }

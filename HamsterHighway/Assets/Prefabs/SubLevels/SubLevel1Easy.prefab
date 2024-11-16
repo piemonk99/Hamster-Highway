@@ -47,6 +47,7 @@ Transform:
   - {fileID: 3345251409922627526}
   - {fileID: 8725845283691624181}
   - {fileID: 9080222387318401270}
+  - {fileID: 205055897706576363}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6339611113437634735
@@ -63,6 +64,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   difficultyValue: 1
   isCoreLevel: 1
+  revivePosition: {fileID: 205055897706576363}
+--- !u!1 &7962980876002705035
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 205055897706576363}
+  m_Layer: 5
+  m_Name: RevivePosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &205055897706576363
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7962980876002705035}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.5, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 885943092452806543}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &578220771715846139
 PrefabInstance:
   m_ObjectHideFlags: 0

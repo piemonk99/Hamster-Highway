@@ -1739,14 +1739,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ball: {fileID: 1376456097}
   uiManager: {fileID: 1869230036}
-  scoreText: {fileID: 1024634092}
+  scoreText: {fileID: 0}
   levelParent: {fileID: 2139850469}
   startSubLevelPrefab: {fileID: 1396932437}
   subLevelPrefabs:
   - {fileID: 4495728076952984282, guid: 1af0b5be67d24e449837322952d2c9f4, type: 3}
   gravityInversionSubLevelPrefabs:
   - {fileID: 4978317053609484475, guid: a795659fe73cf41438d130f7f75aa8e4, type: 3}
-  scoreTriggersPrefab: {fileID: 1267227594201468958, guid: e9baaaf54bdcb9a4984ed96ef94bbedd, type: 3}
+  scoreTriggersPrefab: {fileID: 0}
   subLevelsToLoadAtOnce: 10
   subLevelsPerGravityInversions: 5
   doGeneration: 1
@@ -3394,7 +3394,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scoreText: {fileID: 1864082667}
   newBestScoreText: {fileID: 441771743}
-  reviveButton: {fileID: 1512429813}
+  reviveButton: {fileID: 1512429814}
   reviveCostText: {fileID: 434153598}
   hamster: {fileID: 1269069898068515109}
   gameOverAudio: {fileID: 1911584849}
@@ -4494,7 +4494,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8769747154265449392, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
       propertyPath: invulnerable
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8769747154265449392, guid: 34f99a596e2165a47b4d5d6f8df0ba01, type: 3}
       propertyPath: inversionsText

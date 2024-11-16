@@ -330,6 +330,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void ResetBoostPads(Transform subLevel)
+    {
+        foreach (Transform interactable in subLevel.GetComponentsInChildren<Transform>())
+            if (interactable.name == "Booster Pad" || interactable.name == "Strong Booster Pad")
+            {
+                BoostPad boostPadScript = interactable.GetComponent<BoostPad>();
+
+                if (boostPadScript != null)
+                    boostPadScript.ResetBoostPad();
+            }
+    }
+
     private void FlipBoxCollidersInSubLevel(Transform subLevel)
     {
         // Get all BoxColliders in the sublevel
@@ -367,14 +379,16 @@ public class GameManager : MonoBehaviour
 
     public Vector3 GetRevivePosition()
     {
-        subLevelBallIsIn++;
+        // subLevelBallIsIn++;
 
-        Debug.Log($"Reviving in sublevel {GetSubLevel(subLevelBallIsIn)}");
+        // Debug.Log($"Reviving in sublevel {GetSubLevel(subLevelBallIsIn)}");
 
-        float xPosition = (subLevelBallIsIn * 16) + .5f; // Sublevel X coordinate
-        float yPosition = IsCurrentSublevelInverted() ? 9 - 1.2f : 1.2f; // Adjust Y based on gravity
-        subLevelBallIsIn--;
-        return new Vector3(xPosition, yPosition, 0);
+        // float xPosition = (subLevelBallIsIn * 16) + .5f; // Sublevel X coordinate
+        // float yPosition = IsCurrentSublevelInverted() ? 9 - 1.2f : 1.2f; // Adjust Y based on gravity
+        // subLevelBallIsIn--;
+        GameObject subLevel = GetSubLevel(subLevelBallIsIn);
+        ResetBoostPads(subLevel.transform);
+        return subLevel.GetComponent<SublevelDifficulty>().revivePosition.position;
     }
 
     public bool IsCurrentSublevelInverted()
