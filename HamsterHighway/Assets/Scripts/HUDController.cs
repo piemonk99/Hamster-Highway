@@ -8,7 +8,7 @@ public class HUDController : MonoBehaviour
 
     public void SetInvertGravityButtonActivity(bool isActive)
     {
-        GameObject invertGravityButton = gravityInversionWidget.transform.Find("Gravity Button").gameObject;
+        GameObject invertGravityButton = gravityInversionWidget?.transform.Find("Gravity Button").gameObject;
         RectTransform inversionsRemainingText = gravityInversionWidget.transform.Find("Remaining Inversions").GetComponent<RectTransform>();
 
         if (isActive)
@@ -19,7 +19,7 @@ public class HUDController : MonoBehaviour
         if (!isActive)
         {
             invertGravityButton.SetActive(false);
-            inversionsRemainingText.anchoredPosition = new Vector2(-100, inversionsRemainingText.anchoredPosition.y); // Set x position to -100
+            inversionsRemainingText.anchoredPosition = new Vector2(-125, inversionsRemainingText.anchoredPosition.y); // Set x position to -100
         }
         
     }
