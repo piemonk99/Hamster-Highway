@@ -20,11 +20,6 @@ public class BoostPad : MonoBehaviour
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
     }
-    
-    void Update()
-    {
-        Debug.DrawLine(transform.position, transform.position + (inverted ? -transform.up : transform.up) * 5);
-    }
 
     private void OnTriggerEnter(Collider other)
     {
