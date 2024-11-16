@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class PauseMenuController : MonoBehaviour
 {
-    [SerializeField] private GameObject optionsMenu;
     [SerializeField] private GameObject gameHUD;
 
     public void PauseButtonClicked()
@@ -20,13 +19,9 @@ public class PauseMenuController : MonoBehaviour
         gameHUD.SetActive(true);
         gameObject.SetActive(false);
     }
-    public void OptionsButtonClicked()
-    {
-        optionsMenu.SetActive(true);
-        gameObject.SetActive(false);
-    }
     public void MainMenuButtonClicked()
     {
+        Time.timeScale = 1;
         SceneManager.LoadScene("MainMenu");
     }
 }

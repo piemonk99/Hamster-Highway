@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4841866663212716182
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3469293546594869964}
+  - component: {fileID: 3966511052156623774}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3469293546594869964
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4841866663212716182}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3966511052156623774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4841866663212716182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29384b87ad2a5c945ae470a8c6fa907c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ball: {fileID: 0}
+  hudController: {fileID: 0}
+  scoreText: {fileID: 0}
+  levelParent: {fileID: 0}
+  startSubLevelPrefab: {fileID: 7027571760552252951, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+  subLevelPrefabs:
+  - {fileID: 2254665384115040524, guid: 3137a3e6f48203e438161718124ca0ae, type: 3}
+  - {fileID: 2254665384115040524, guid: e63744f646e745c4994d9691cd0fa225, type: 3}
+  - {fileID: 2972924574791439986, guid: dad7f671bec8d4640af19c92c2056ff7, type: 3}
+  - {fileID: 2972924574791439986, guid: c1a4411b82cbd854fa937f45820c2052, type: 3}
+  - {fileID: 3012176783001724933, guid: a607f01c6928fe84abba949916672031, type: 3}
+  - {fileID: 3012176783001724933, guid: a81629f506ad47a4db574033a303e980, type: 3}
+  - {fileID: 7286215589249892534, guid: e5c092284ea0e05418b9cf473433571c, type: 3}
+  - {fileID: 7286215589249892534, guid: 372bfde620c6dbe49b245387c0004c89, type: 3}
+  - {fileID: 6239213134818172239, guid: 1e7d031df9d91b9459f74bab50065ba0, type: 3}
+  - {fileID: 6528529421870770569, guid: f17ab26f4de699d4ab614faa223e4968, type: 3}
+  - {fileID: 6528529421870770569, guid: 4d2ec948458275149a07c254d3f82121, type: 3}
+  - {fileID: 4495728076952984282, guid: 1af0b5be67d24e449837322952d2c9f4, type: 3}
+  - {fileID: 4495728076952984282, guid: d61df836026fa4741b475f9d17b9a1d3, type: 3}
+  - {fileID: 7027571760552252951, guid: cd8c97ccd8c8b41498aaa823031aaa80, type: 3}
+  - {fileID: 7027571760552252951, guid: 0746df6afa319634c8a4b1fc77dee8ef, type: 3}
+  - {fileID: 7027571760552252951, guid: f6a84adc7b0919f449bfab08ba12950f, type: 3}
+  gravityInversionSubLevelPrefabs:
+  - {fileID: 4978317053609484475, guid: a795659fe73cf41438d130f7f75aa8e4, type: 3}
+  - {fileID: 4978317053609484475, guid: 8dfa8f4dd1682e947845d6ffa6e95e79, type: 3}
+  - {fileID: 4978317053609484475, guid: 667915fccf6832a4794ae8a860829e37, type: 3}
+  scoreTriggersPrefab: {fileID: 1267227594201468958, guid: e9baaaf54bdcb9a4984ed96ef94bbedd, type: 3}
+  subLevelsToLoadAtOnce: 20
+  subLevelsPerGravityInversions: 5
+  doGeneration: 1
+  arMode: 0
+  subLevelBallIsIn: 0

@@ -11,7 +11,7 @@ public class ScoreTrigger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             ScoreTracker.Instance.score++;
-            GameManager.Instance.scoreText.text = "Score: " + ScoreTracker.Instance.score.ToString();
+            GameManager.Instance.scoreText.text = ScoreTracker.Instance.score.ToString();
             Destroy(gameObject);
 
             if (isLastTrigger) { Destroy(transform.parent); }

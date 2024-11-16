@@ -9,7 +9,7 @@ public class Hamster : MonoBehaviour
     private Animator animator;
     private Rigidbody rb;
 
-    [SerializeField] private GameObject UICanvas;
+    [SerializeField] private GameObject playerHUD;
     [SerializeField] private GameObject gameOverUI;
     private bool isGameOver = false;
     private int revivesUsed = 0;
@@ -28,7 +28,6 @@ public class Hamster : MonoBehaviour
     [SerializeField] private float accelerometerMaxSpeed = 1.5f;
     [SerializeField] private float yawForce = 1;
 
-    [SerializeField] private TextMeshProUGUI debugText;
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI coinsText;
     [SerializeField] private TextMeshProUGUI inversionsText;
@@ -49,7 +48,6 @@ public class Hamster : MonoBehaviour
     public bool flippingEnabled;
     public bool tiltingEnabled;
 
-    private bool tripping;
     private bool rolling;
 
     private float gravityCooldownTimer = 0;
@@ -86,7 +84,7 @@ public class Hamster : MonoBehaviour
 
         previousRotation = transform.rotation;
 
-        coinsText.text = $"Coins: {ScoreTracker.Instance.coins}";
+        coinsText.text = $"{ScoreTracker.Instance.coins}";
     }
 
     private void FixedUpdate()
@@ -114,7 +112,6 @@ public class Hamster : MonoBehaviour
         Vector3 subLevelRight = currentSubLevel.transform.right;
         float minSpeed = minimumForwardSpeed;
 
-        debugText.text = $"{Input.acceleration}";
         Vector3 accelerometer = Input.acceleration;
 
         HandleGravity(accelerometer.y);
@@ -150,7 +147,7 @@ public class Hamster : MonoBehaviour
                     invertedGravity = accelerometerY >= 0;
                     transform.Find("Hamster").localScale = invertedGravity ? new Vector3(initialHamsterScale.x, -initialHamsterScale.y, initialHamsterScale.z) : initialHamsterScale;
                     gravityInversionCredits--;
-                    inversionsText.text = $"Inversions: {gravityInversionCredits}/{maxGravityInversionCredits}";
+                    inversionsText.text = $"{gravityInversionCredits}/{maxGravityInversionCredits}";
                 }
             }
 
@@ -176,7 +173,7 @@ public class Hamster : MonoBehaviour
         {
             gravityInversionCredits++;
             gravityCooldownTimer = 0f;
-            inversionsText.text = $"Inversions: {gravityInversionCredits}/{maxGravityInversionCredits}";
+            inversionsText.text = $"{gravityInversionCredits}/{maxGravityInversionCredits}";
         }
     }
 
@@ -188,7 +185,7 @@ public class Hamster : MonoBehaviour
             invertedGravity = !invertedGravity;
             transform.Find("Hamster").localScale = invertedGravity ? new Vector3(initialHamsterScale.x, -initialHamsterScale.y, initialHamsterScale.z) : initialHamsterScale;
             gravityInversionCredits--;
-            inversionsText.text = $"Inversions: {gravityInversionCredits}/{maxGravityInversionCredits}";
+            inversionsText.text = $"{gravityInversionCredits}/{maxGravityInversionCredits}";
         }
     }
 
@@ -301,6 +298,9 @@ public class Hamster : MonoBehaviour
         ///Debug.DrawLine(correctedPosition, correctedPosition + Vector3.up * 5, Color.green, 0.1f);
     }
 
+    private float hamsterRollingXRotation; // Store initial hamster x-rotation when rolling starts
+
+
     private void LateUpdate()
     {
         HandleRolling();
@@ -311,35 +311,36 @@ public class Hamster : MonoBehaviour
     {
         float angularVelocityMagnitude = rb.angularVelocity.magnitude;
 
-        if (!tripping && !rolling && angularVelocityMagnitude > angularVelocityThreshold)
+        if (!rolling && angularVelocityMagnitude > angularVelocityThreshold)
         {
             // Start rolling
             animator.SetTrigger("BeginRolling");
 
-            tripping = true;
+            CorrectHamsterRotation();
+            StartRolling();
         }
-        else if (rolling && angularVelocityMagnitude < angularVelocityRecovery && IsHamsterAlignedWithParent())
+        else if (rolling && angularVelocityMagnitude < angularVelocityRecovery && IsHamsterAlignedWithFloor())
         {
             // Stop rolling
             rolling = false;
             animator.SetBool("Rolling", false);
-            CorrectHamsterRotation(); // Re-enable upright correction
         }
 
         if (!rolling)
         {
             CorrectHamsterRotation();
         }
+        else
+        {
+            RollWithParent();
+        }
     }
 
-    // Called by the trip and roll animation, allows us to stop correcting the hamster's rotation at the right time
-    public void StartRolling()
+    private void StartRolling()
     {
-        // When starting to roll, we capture the parent's current rotation as the baseline
-        previousRotation = transform.rotation;
+        hamsterRollingXRotation = 180 - transform.GetChild(0).localRotation.eulerAngles.x;
 
         rolling = true;
-        tripping = false;
 
         animator.SetBool("Rolling", true);
     }
@@ -350,23 +351,55 @@ public class Hamster : MonoBehaviour
         GameObject currentSubLevel = gameManager.GetSubLevel(gameManager.subLevelBallIsIn);
 
         hamsterModel.rotation = Quaternion.Euler(0, -90 + currentSubLevel.transform.eulerAngles.y, 0);
+
+        Debug.Log($"Hamster model's local x angle is {180 - transform.GetChild(0).localRotation.eulerAngles.x} after corrected");
+    }
+    private void RollWithParent()
+    {
+        Transform hamsterModel = transform.Find("Hamster");
+        GameObject currentSubLevel = gameManager.GetSubLevel(gameManager.subLevelBallIsIn);
+
+        //hamsterRollingXRotation += transform.eulerAngles.x - previousHamsterXRotation;
+
+        Debug.Log($"RollWithParent is setting local hamster rotation to ({hamsterRollingXRotation}, {-90 + currentSubLevel.transform.eulerAngles.y}, {0})");
+
+        hamsterModel.localRotation = Quaternion.Euler(hamsterRollingXRotation, -90 + currentSubLevel.transform.eulerAngles.y, 0);
     }
 
-    private bool IsHamsterAlignedWithParent()
+    private bool IsHamsterAlignedWithFloor()
     {
-        // Get the parent and child Y-axis rotations
-        float parentZRotation = transform.eulerAngles.z;
-        float childXRotation = transform.GetChild(0).localRotation.eulerAngles.x;
+        Transform hamsterModel = transform.Find("Hamster");
+        float parentZRotation = transform.rotation.eulerAngles.z;
+        if (parentZRotation > 180)
+        {
+            parentZRotation -= 360; // Convert to -180 to 180 range
+        }
 
-        // We want the parent's rotation to be close to the inverse of the child's locked rotation
-        float rotationDifference = Mathf.Abs(((parentZRotation + 180) % 360) - childXRotation);
+        Debug.Log($"ChildXRotation: {parentZRotation} hamsterRollingXRotation: {hamsterRollingXRotation}");
+
+        float rotationTotal = parentZRotation + hamsterRollingXRotation;
 
         // Tolerance to account for slight differences
-        float tolerance = 10f;
+        float lowerLimit, upperLimit;
+
+        lowerLimit = -10;
+        upperLimit = 10;
+
+        Debug.Log($"Checking if {rotationTotal} < {upperLimit} && {rotationTotal} > {lowerLimit}");
+
 
         // Return true if the parent's Y rotation is close to the inverse of the child's Y rotation
-        return rotationDifference < tolerance;
+        return (rotationTotal > lowerLimit && rotationTotal < upperLimit);
     }
+
+    float ConvertToRange180(float angle)
+    {
+        // Normalize angle to the range -180 to 180
+        float newAngle = (angle + 180) % 360;
+        if (newAngle > 180) newAngle -= 360;
+        return newAngle;
+    }
+
 
 
     private void OnTriggerEnter(Collider other)
@@ -374,7 +407,7 @@ public class Hamster : MonoBehaviour
         if (other.CompareTag("Coin"))
         {
             ++ScoreTracker.Instance.coins;
-            coinsText.text = $"Coins: {ScoreTracker.Instance.coins}";
+            coinsText.text = $"{ScoreTracker.Instance.coins}";
             AudioClipPlayer.PlayClipAtPoint(coinSound, other.gameObject.transform.position);
             Destroy(other.gameObject);
         }
@@ -403,7 +436,7 @@ public class Hamster : MonoBehaviour
         isGameOver = true;
         rb.velocity = Vector3.zero;
         rb.isKinematic = true; // Freeze movement
-        UICanvas.SetActive(false);
+        playerHUD.SetActive(false);
         gameOverUI.SetActive(true);
         Time.timeScale = 0; // Pause the game
     }
@@ -412,7 +445,7 @@ public class Hamster : MonoBehaviour
     {
         revivesUsed += 1;
 
-        coinsText.text = $"Coins: {ScoreTracker.Instance.coins}";
+        coinsText.text = $"{ScoreTracker.Instance.coins}";
 
         // Reset position based on current sublevel and gravity
         Vector3 revivePosition = gameManager.GetRevivePosition();
@@ -426,7 +459,7 @@ public class Hamster : MonoBehaviour
 
         isGameOver = false;
         gameOverUI.SetActive(false);
-        UICanvas.SetActive(true);
+        playerHUD.SetActive(true);
 
         // Focus the camera on the ball once
         if (Camera.main.GetComponent<CameraController>() != null)

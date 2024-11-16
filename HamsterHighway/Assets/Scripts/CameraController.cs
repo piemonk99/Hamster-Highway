@@ -14,9 +14,7 @@ public class CameraController : MonoBehaviour
     {
         cam = GetComponent<Camera>();
 
-        // Load the followBall option from the saved options
-        Options.Read();
-        followBall = Options.Instance.cameraFollowBall;
+        RefreshOptions();
 
         // Disable dragging if following the ball
         MayDrag = !followBall;
@@ -63,5 +61,12 @@ public class CameraController : MonoBehaviour
             Vector3 currentDragPosition = cam.ScreenToWorldPoint(Input.mousePosition);
             transform.position += new Vector3(dragPosition.x - currentDragPosition.x, 0, 0);
         }
+    }
+
+    public void RefreshOptions()
+    {
+        // Load the followBall option from the saved options
+        Options.Read();
+        followBall = Options.Instance.cameraFollowBall;
     }
 }

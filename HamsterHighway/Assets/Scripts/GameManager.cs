@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; } // Singleton instance
 
     [SerializeField] private Transform ball;
-    [SerializeField] private UIManager uiManager;
+    [SerializeField] private HUDController hudController;
     public TextMeshProUGUI scoreText;
 
     [SerializeField] private Transform levelParent;
@@ -151,6 +151,8 @@ public class GameManager : MonoBehaviour
 
         GameObject newSubLevel;
 
+        
+
         ///Debug.Log($"Budget before choosing sublevel: {difficultyBudget}");
 
         // Swap gravity using a gravity inversion sublevel every certain number of levels
@@ -159,6 +161,11 @@ public class GameManager : MonoBehaviour
             ///Debug.Log("Spawning gravity inversion sublevel...");
             newSubLevel = PickAndInstantiateSublevel(coreGravityInversionSubLevels, true);
             PositionAndInvertSubLevel(newSubLevel, position, rotation);
+
+            // Instantiates score triggers for sublevel
+            GameObject subLevelScoreTriggers = Instantiate(scoreTriggersPrefab, newSubLevel.transform);
+            if (gravityInverted) FlipBoxCollidersInSubLevel(subLevelScoreTriggers.transform);
+
             gravityInverted = !gravityInverted;
         }
         else
@@ -166,15 +173,17 @@ public class GameManager : MonoBehaviour
             // Pick a sublevel based on the current budget from core levels
             newSubLevel = PickAndInstantiateSublevel(coreSubLevels, false);
             PositionAndInvertSubLevel(newSubLevel, position, rotation);
+
+            // Instantiates score triggers for sublevel
+            GameObject subLevelScoreTriggers = Instantiate(scoreTriggersPrefab, newSubLevel.transform);
+            if (gravityInverted) FlipBoxCollidersInSubLevel(subLevelScoreTriggers.transform);
         }
 
-        // Instantiates score triggers for sublevel
-        Instantiate(scoreTriggersPrefab, newSubLevel.transform);
-
+        
 
         // Update generatedSublevelCount and calculate the budget increment based on it
         generatedSublevelCount++;
-        float budgetIncrease = 1.0f + (generatedSublevelCount * 16 / 100.0f); // Using generated count for difficulty growth
+        float budgetIncrease = 1.0f + (generatedSublevelCount * 15 / 100.0f); // Using generated count for difficulty growth
         difficultyBudget += budgetIncrease;
 
         // Clamp difficultyBudget between -7 and 12
@@ -367,14 +376,17 @@ public class GameManager : MonoBehaviour
     public void RefreshOptions()
     {
         // Read the settings from Options class
-        flippingEnabled = Options.Instance.invertGravityWithButton;
+        flippingEnabled = Options.Instance.usePhoneFlipping;
         tiltingEnabled = Options.Instance.useAccelerometer;
 
-        // Call UIManager to update the gravity inversion button based on flippingEnabled
-        uiManager.SetInvertGravityButtonActivity(!flippingEnabled);
+        // Call HUDController to update the gravity inversion button based on flippingEnabled
+        hudController.SetInvertGravityButtonActivity(!flippingEnabled);
 
         ball.GetComponent<Hamster>().flippingEnabled = flippingEnabled;
         ball.GetComponent<Hamster>().tiltingEnabled = tiltingEnabled;
+
+        // Refreshes options in the camera controller script if necessary
+        Camera.main.GetComponent<CameraController>()?.RefreshOptions();
     }
 
     public Vector3 GetRevivePosition()

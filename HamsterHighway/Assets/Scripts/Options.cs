@@ -11,7 +11,7 @@ public class Options
 
     // New toggles
     [SerializeField] public bool useAccelerometer = true;
-    [SerializeField] public bool invertGravityWithButton = false;
+    [SerializeField] public bool usePhoneFlipping = false;
     [SerializeField] public bool cameraFollowBall = false;
     [SerializeField] public bool arMode = true;
 
