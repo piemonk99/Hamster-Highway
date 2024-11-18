@@ -259,6 +259,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+--- !u!1 &168003844 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7027571760552252951, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+  m_PrefabInstance: {fileID: 132127702}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &908527861
 GameObject:
   m_ObjectHideFlags: 0
@@ -1531,6 +1536,14 @@ PrefabInstance:
       propertyPath: hudController
       value: 
       objectReference: {fileID: 2648573860026248809}
+    - target: {fileID: 3966511052156623774, guid: b7b30ec007402444f9a811420b0c57b7, type: 3}
+      propertyPath: startSubLevel
+      value: 
+      objectReference: {fileID: 168003844}
+    - target: {fileID: 3966511052156623774, guid: b7b30ec007402444f9a811420b0c57b7, type: 3}
+      propertyPath: startSubLevelPrefab
+      value: 
+      objectReference: {fileID: 168003844}
     - target: {fileID: 4841866663212716182, guid: b7b30ec007402444f9a811420b0c57b7, type: 3}
       propertyPath: m_Name
       value: GameManager

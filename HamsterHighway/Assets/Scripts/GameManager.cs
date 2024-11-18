@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
 
     [SerializeField] private Transform levelParent;
-    [SerializeField] private GameObject startSubLevelPrefab;
+    [SerializeField] private GameObject startSubLevel;
     [SerializeField] private GameObject[] subLevelPrefabs;
     [SerializeField] private GameObject[] gravityInversionSubLevelPrefabs;
     private Queue<GameObject> subLevelQueue;
@@ -60,8 +60,8 @@ public class GameManager : MonoBehaviour
         currentLevelCenter = (int)(subLevelsToLoadAtOnce / 2f);
 
         subLevelQueue = new Queue<GameObject>();
-        subLevelQueue.Enqueue(startSubLevelPrefab);
-        prevLevelTransform = startSubLevelPrefab.transform;
+        subLevelQueue.Enqueue(startSubLevel);
+        prevLevelTransform = startSubLevel.transform;
         subLevelDictionary = new Dictionary<int, GameObject>();
 
         // Initialize core sublevels lists

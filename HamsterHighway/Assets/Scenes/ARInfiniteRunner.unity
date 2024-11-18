@@ -453,6 +453,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+--- !u!1 &132127703 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7027571760552252951, guid: cfe9962c910808f44ac2098445c72e48, type: 3}
+  m_PrefabInstance: {fileID: 132127702}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &210040353
 GameObject:
   m_ObjectHideFlags: 0
@@ -1696,6 +1701,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 515808752}
     - target: {fileID: 3966511052156623774, guid: b7b30ec007402444f9a811420b0c57b7, type: 3}
+      propertyPath: startSubLevel
+      value: 
+      objectReference: {fileID: 132127703}
+    - target: {fileID: 3966511052156623774, guid: b7b30ec007402444f9a811420b0c57b7, type: 3}
       propertyPath: subLevelsToLoadAtOnce
       value: 10
       objectReference: {fileID: 0}
@@ -2644,6 +2653,7 @@ MonoBehaviour:
   reviveCostText: {fileID: 434153598}
   hamster: {fileID: 1269069898068515109}
   gameOverAudio: {fileID: 1911584849}
+  musicAudio: {fileID: 0}
   newBestScoreClip: {fileID: 8300000, guid: de0c2d1b5f8f072c69799b47d632ea3d, type: 3}
   newBestScoreTextFlashSpeed: 2
 --- !u!114 &1903581156
