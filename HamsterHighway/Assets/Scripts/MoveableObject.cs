@@ -66,11 +66,8 @@ public class MoveableObject : MonoBehaviour
             movingToDestination = false; // Stop automatic lerping when user drags
         }
 
-        Vector3 screenPosition = Input.mousePosition;
-        // screenPosition.z = 10; // Set the z-distance for screen to world conversion
-
-        Vector3 relativePosition = transform.parent.InverseTransformPoint(mainCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, mainCamera.WorldToScreenPoint(transform.position).z)));
-        destination = ClampToTrack(relativePosition);
+        Vector3 mouseDirection = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1)).normalized;
+        destination = ClampToTrack(transform.parent.InverseTransformPoint(ARUtil.RayIntersect(mainCamera.transform.position, mouseDirection, transform.position, transform.forward)));
 
         // // Get the Rigidbody component
         // Rigidbody rb = GetComponent<Rigidbody>();
@@ -134,11 +131,11 @@ public class MoveableObject : MonoBehaviour
                 mouseDownPosition = Input.mousePosition;
             else if (Input.GetMouseButtonUp(0) && Vector3.Distance(mouseDownPosition, Input.mousePosition) < 0.1)
             {
-                Vector3 localClickPosition = transform.parent.InverseTransformPoint(mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, mainCamera.WorldToScreenPoint(transform.position).z)));
-                localClickPosition.z = transform.localPosition.z;
+                Vector3 mouseDirection = (mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1)) - mainCamera.transform.position).normalized;
+                Vector3 localClickPosition = transform.parent.InverseTransformPoint(ARUtil.RayIntersect(mainCamera.transform.position, mouseDirection, transform.position, transform.forward));
                 Vector3 clampedPosition = ClampToTrack(localClickPosition);
 
-                if (Vector3.Distance(localClickPosition, clampedPosition) < 0.3)
+                if (Vector3.Distance(localClickPosition, clampedPosition) < 0.5)
                 {
                     destination = clampedPosition;
                     movingToDestination = true;

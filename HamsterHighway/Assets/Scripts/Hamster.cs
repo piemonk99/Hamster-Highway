@@ -136,7 +136,7 @@ public class Hamster : MonoBehaviour
         {
             ++skyboxChangeTracker;
             int temp = currentSkybox;
-            
+
             do
             {
                 currentSkybox = Random.Range(0, skyboxes.Length);
@@ -366,7 +366,7 @@ public class Hamster : MonoBehaviour
 
         hamsterModel.rotation = Quaternion.Euler(0, -90 + currentSubLevel.transform.eulerAngles.y, 0);
 
-        Debug.Log($"Hamster model's local x angle is {180 - transform.GetChild(0).localRotation.eulerAngles.x} after corrected");
+        // Debug.Log($"Hamster model's local x angle is {180 - transform.GetChild(0).localRotation.eulerAngles.x} after corrected");
     }
     private void RollWithParent()
     {
@@ -375,7 +375,7 @@ public class Hamster : MonoBehaviour
 
         //hamsterRollingXRotation += transform.eulerAngles.x - previousHamsterXRotation;
 
-        Debug.Log($"RollWithParent is setting local hamster rotation to ({hamsterRollingXRotation}, {-90 + currentSubLevel.transform.eulerAngles.y}, {0})");
+        // Debug.Log($"RollWithParent is setting local hamster rotation to ({hamsterRollingXRotation}, {-90 + currentSubLevel.transform.eulerAngles.y}, {0})");
 
         hamsterModel.localRotation = Quaternion.Euler(hamsterRollingXRotation, -90 + currentSubLevel.transform.eulerAngles.y, 0);
     }
@@ -389,7 +389,7 @@ public class Hamster : MonoBehaviour
             parentZRotation -= 360; // Convert to -180 to 180 range
         }
 
-        Debug.Log($"ChildXRotation: {parentZRotation} hamsterRollingXRotation: {hamsterRollingXRotation}");
+        // Debug.Log($"ChildXRotation: {parentZRotation} hamsterRollingXRotation: {hamsterRollingXRotation}");
 
         float rotationTotal = parentZRotation + hamsterRollingXRotation;
 
@@ -399,7 +399,7 @@ public class Hamster : MonoBehaviour
         lowerLimit = -10;
         upperLimit = 10;
 
-        Debug.Log($"Checking if {rotationTotal} < {upperLimit} && {rotationTotal} > {lowerLimit}");
+        // Debug.Log($"Checking if {rotationTotal} < {upperLimit} && {rotationTotal} > {lowerLimit}");
 
 
         // Return true if the parent's Y rotation is close to the inverse of the child's Y rotation
