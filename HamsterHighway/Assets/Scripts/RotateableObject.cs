@@ -62,8 +62,13 @@ public class RotatableObject : MonoBehaviour
             movingToDestination = false;
         }
 
-        Vector3 mouseDirection = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1)).normalized;
-        HandleRotation(transform.parent.InverseTransformPoint(ARUtil.RayIntersect(mainCamera.transform.position, mouseDirection, transform.position, transform.forward)));
+        if (GameManager.Instance.IsARMode())
+        {
+            Vector3 mouseDirection = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1)).normalized;
+            HandleRotation(transform.parent.InverseTransformPoint(ARUtil.RayIntersect(mainCamera.transform.position, mouseDirection, transform.position, transform.forward)));
+        }
+        else
+            HandleRotation(transform.parent.InverseTransformPoint(mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, mainCamera.WorldToScreenPoint(transform.position).z))));
     }
 
     private void HandleRotation(Vector3 relativePosition)
@@ -103,8 +108,19 @@ public class RotatableObject : MonoBehaviour
                 mouseDownPosition = Input.mousePosition;
             else if (Input.GetMouseButtonUp(0) && Vector3.Distance(mouseDownPosition, Input.mousePosition) < 0.1)
             {
-                Vector3 mouseDirection = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1)).normalized;
-                Vector3 localClickPosition = transform.parent.InverseTransformPoint(ARUtil.RayIntersect(mainCamera.transform.position, mouseDirection, transform.position, transform.forward));
+                Vector3 localClickPosition;
+
+                if (GameManager.Instance.IsARMode())
+                {
+                    Vector3 mouseDirection = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1)).normalized;
+                    localClickPosition = transform.parent.InverseTransformPoint(ARUtil.RayIntersect(mainCamera.transform.position, mouseDirection, transform.position, transform.forward));
+                }
+                else
+                {
+                    localClickPosition = transform.parent.InverseTransformPoint(mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, mainCamera.WorldToScreenPoint(transform.position).z)));
+                    localClickPosition.z = transform.localPosition.z;
+                }
+
                 Vector3 clampedPosition = transform.localPosition + (localClickPosition - transform.localPosition).normalized * transform.localScale.x;
                 Vector3 directionFromPivot = localClickPosition - transform.localPosition;
                 float angle = Mathf.Atan2(directionFromPivot.y, directionFromPivot.x) * Mathf.Rad2Deg;
