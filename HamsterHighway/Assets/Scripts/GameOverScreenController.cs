@@ -45,8 +45,8 @@ public class GameOverScreenController : MonoBehaviour
     public void ConfigureReviveButton()
     {
         int reviveCost = 50 + (50 * hamster.GetRevivesUsed());
-        reviveCostText.text = (reviveCost).ToString();
-        reviveButton.enabled = ScoreTracker.Instance.coins > reviveCost;
+        reviveCostText.text = reviveCost.ToString();
+        reviveButton.interactable = ScoreTracker.Instance.coins >= reviveCost;
     }
 
     public void MainMenuButtonClicked()
