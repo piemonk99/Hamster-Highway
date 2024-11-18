@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -16,6 +14,7 @@ public class GameOverScreenController : MonoBehaviour
     [SerializeField] private Hamster hamster; // Reference to Hamster script
 
     [SerializeField] private AudioSource gameOverAudio;
+    [SerializeField] private AudioSource musicAudio;
 
     [SerializeField] private AudioClip newBestScoreClip;
 
@@ -35,12 +34,13 @@ public class GameOverScreenController : MonoBehaviour
 
         gameOverAudio.volume = Options.Instance.Volume;
         gameOverAudio.Play();
+        musicAudio.Pause();
     }
 
     void Update()
     {
         newBestScoreText.color = Color.Lerp(Color.white, Color.yellow, (Mathf.Sin(Time.time * 2 * Mathf.PI * newBestScoreTextFlashSpeed) + 1) / 2);
-    }   
+    }
 
     public void ConfigureReviveButton()
     {
@@ -64,5 +64,7 @@ public class GameOverScreenController : MonoBehaviour
     {
         ScoreTracker.Instance.coins -= 50 + (50 * hamster.GetRevivesUsed());
         hamster.Revive();
+        musicAudio.UnPause();
+        gameOverAudio.Stop();
     }
 }
