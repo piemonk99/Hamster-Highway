@@ -58,6 +58,6 @@ public class OptionsMenuController : MonoBehaviour
 
     private void OnDisable()
     {
-        GameManager.Instance.RefreshOptions();
+        GameManager.Instance?.RefreshOptions();
     }
 }
