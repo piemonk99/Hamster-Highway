@@ -58,8 +58,8 @@ public class Hamster : MonoBehaviour
 
     private float previousYVelocity = 0;
     private Vector3 initialHamsterScale;
-    // private int skyboxChangeTracker;
-    // private int currentSkybox;
+    private int skyboxChangeTracker;
+    private int currentSkybox;
 
     [SerializeField] private bool invulnerable;
 
@@ -131,6 +131,20 @@ public class Hamster : MonoBehaviour
         previousPosition = transform.localPosition;
 
         PlayCorrectAnimation();
+
+        if (!gameManager.IsARMode() && ScoreTracker.Instance.score - skyboxChangeTracker * skyboxChangeInterval > skyboxChangeInterval)
+        {
+            ++skyboxChangeTracker;
+            int temp = currentSkybox;
+            
+            do
+            {
+                currentSkybox = Random.Range(0, skyboxes.Length);
+            } while (currentSkybox == temp);
+
+            RenderSettings.skybox = skyboxes[currentSkybox];
+            DynamicGI.UpdateEnvironment();
+        }
     }
 
 
