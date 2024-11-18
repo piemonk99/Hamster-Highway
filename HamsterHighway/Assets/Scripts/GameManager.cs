@@ -427,4 +427,9 @@ public class GameManager : MonoBehaviour
     {
         subLevelBallIsIn++;
     }
+
+    public bool IsARMode()
+    {
+        return arMode;
+    }
 }
