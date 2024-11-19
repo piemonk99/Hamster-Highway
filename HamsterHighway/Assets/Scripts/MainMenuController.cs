@@ -43,4 +43,9 @@ public class MainMenuController : MonoBehaviour
         Options.Instance.arMode = isOn;
         Options.Instance.Write();
     }
+
+    public void ResetBestScoreText()
+    {
+        bestScoreText.text = $"{ScoreTracker.Instance.bestScore}";
+    }
 }

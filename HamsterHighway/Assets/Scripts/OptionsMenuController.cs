@@ -19,6 +19,7 @@ public class OptionsMenuController : MonoBehaviour
         Options.Read();
 
         volumeSlider.value = Options.Instance.Volume;
+        volumeText.text = $"{(int) (volumeSlider.value * 100)}%";
 
         accelerometerToggle.isOn = Options.Instance.useAccelerometer;
         gravityToggle.isOn = Options.Instance.usePhoneFlipping;
