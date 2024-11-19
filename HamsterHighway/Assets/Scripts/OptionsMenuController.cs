@@ -54,10 +54,12 @@ public class OptionsMenuController : MonoBehaviour
     {
         ScoreTracker.Instance.bestScore = 0;
         ScoreTracker.Instance.Write();
+
     }
 
     private void OnDisable()
     {
-        GameManager.Instance?.RefreshOptions();
+        if (SceneManager.GetActiveScene().name == "MainMenu") return;
+        GameManager.Instance.RefreshOptions();
     }
 }

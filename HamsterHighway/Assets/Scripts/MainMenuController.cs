@@ -11,7 +11,7 @@ public class MainMenuController : MonoBehaviour
 
     [SerializeField] private Toggle ARToggle;
 
-    void Start()
+    private void OnEnable()
     {
         Options.Read();
         ScoreTracker.Read();
