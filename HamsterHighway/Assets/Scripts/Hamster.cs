@@ -455,7 +455,7 @@ public class Hamster : MonoBehaviour
         Time.timeScale = 0; // Pause the game
 
         bool diedPastStartingLevel = gameManager.subLevelBallIsIn > 0;
-        gameOverUI.transform.Find("Revive Button & Cost").Find("Revive Button").GetComponent<Button>().interactable = diedPastStartingLevel;
+        gameOverUI.transform.Find("Revive Button & Cost").Find("Revive Button").GetComponent<Button>().interactable &= diedPastStartingLevel;
         gameOverUI.transform.Find("Revive Button & Cost").Find("Revive Cost").gameObject.SetActive(diedPastStartingLevel);
     }
 
